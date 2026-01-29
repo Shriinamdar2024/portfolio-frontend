@@ -4,7 +4,7 @@ import axios from 'axios';
 import PortfolioHome from './pages/PortfolioHome'; 
 import DeveloperConsole from './components/admin/DeveloperConsole';
 import AdminLogin from './pages/AdminLogin';
-import API from './api';
+import API from '../services/api';
 // Secure Guard
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken');
