@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../components/layout/Navbar'; 
 import Hero from '../components/portfolio/Hero';
-import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { 
-  Code2, Briefcase, GraduationCap, Zap, 
-  Github, ExternalLink, Rocket, ChevronRight,
-  Download, Linkedin, UserCheck, Mail, ArrowUpRight, Globe, Layers,
-  Sparkles, Terminal, Command, Layout, Cpu, Sun, Moon, Box
+  Briefcase, GraduationCap,
+  Github,ChevronRight, Linkedin, UserCheck, Mail,  Globe, 
+   Terminal, Layout, Cpu, Sun, Moon,
 } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useSpring, useInView } from 'framer-motion';
+import { motion,  useScroll, useSpring } from 'framer-motion';
 
 const PortfolioHome = () => {
   const [data, setData] = useState(null);
