@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Github, Linkedin, ArrowRight } from 'lucide-react';
+import { Github, Linkedin } from 'lucide-react';
 
 const Hero = ({ name, bio }) => (
   <section className="relative pt-32 pb-20 overflow-hidden">

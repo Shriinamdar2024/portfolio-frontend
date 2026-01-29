@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, UploadCloud, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Sparkles, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const ResumeSync = ({ onSyncSuccess }) => {
   const [loading, setLoading] = useState(false);

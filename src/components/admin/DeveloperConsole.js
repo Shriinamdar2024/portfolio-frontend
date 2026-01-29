@@ -316,7 +316,7 @@ const DeveloperConsole = () => {
 
                 <motion.div variants={itemVariants} className="bg-gradient-to-r from-indigo-500/10 to-transparent border border-white/10 p-10 rounded-[3rem] flex flex-col md:flex-row gap-10 items-center">
                    <label className="w-24 h-24 bg-black border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition-all overflow-hidden shrink-0 group">
-                      {newSkill.preview ? <img src={newSkill.preview} className="w-full h-full object-contain p-4" /> : <ImageIcon size={28} className="text-slate-700 group-hover:text-indigo-500 transition-colors" />}
+                      {newSkill.preview ? <img src={newSkill.preview} alt="Profile" className="w-full h-full object-contain p-4" /> : <ImageIcon size={28} className="text-slate-700 group-hover:text-indigo-500 transition-colors" />}
                       <input type="file" className="hidden" accept="image/*" onChange={handleSkillFileChange} />
                    </label>
                    <div className="flex-1 space-y-4 w-full">
