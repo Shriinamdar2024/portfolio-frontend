@@ -9,7 +9,7 @@ import {
    Terminal, Layout, Cpu, Sun, Moon,
 } from 'lucide-react';
 import { motion,  useScroll, useSpring } from 'framer-motion';
-import API from './services/api';
+import API from '../services/api';
 
 const PortfolioHome = () => {
   const [data, setData] = useState(null);

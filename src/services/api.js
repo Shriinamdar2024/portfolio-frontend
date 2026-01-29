@@ -10,3 +10,5 @@ export const uploadResume = (formData) => API.post('/portfolio/sync', formData, 
 });
 
 export const getPortfolioData = () => API.get('/portfolio');
+
+export default API;
