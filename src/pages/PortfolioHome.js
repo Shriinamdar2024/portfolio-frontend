@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Navbar from '../components/layout/Navbar'; 
 import Hero from '../components/portfolio/Hero';
 import { Badge } from '../components/ui/Badge';
