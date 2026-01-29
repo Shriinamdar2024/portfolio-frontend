@@ -7,7 +7,7 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -17,6 +17,8 @@ const AdminLogin = () => {
       navigate('/dev'); // Redirect to your Developer Console
     } catch (err) {
       setError("Unauthorized access. Key rejected.");
+    }finally {
+    setLoading(false); // Stop loading regardless of result
     }
   };
 
@@ -43,9 +45,12 @@ const AdminLogin = () => {
           
           {error && <p className="text-red-400 text-xs text-center font-medium">{error}</p>}
           
-          <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
-            <ShieldCheck size={20} /> Authorize Access
-          </button>
+          {/* <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
+           {loading ? "Authenticating..." :<ShieldCheck size={20} /> Authorize Access</>}
+          </button> */}
+          <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
+  {loading ? "Authenticating..." : <><ShieldCheck size={20} /> Authorize Access</>}
+</button>
         </form>
       </div>
     </div>
