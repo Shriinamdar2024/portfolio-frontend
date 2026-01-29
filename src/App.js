@@ -4,7 +4,7 @@ import axios from 'axios';
 import PortfolioHome from './pages/PortfolioHome'; 
 import DeveloperConsole from './components/admin/DeveloperConsole';
 import AdminLogin from './pages/AdminLogin';
-
+import API from './api';
 // Secure Guard
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken');
@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/portfolio');
+        const res = await API.get('/portfolio');
         setData(res.data);
       } catch (err) {
         console.error("Error fetching portfolio data:", err);
