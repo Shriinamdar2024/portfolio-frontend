@@ -7,7 +7,7 @@ import {
   Terminal, ShieldCheck, Cpu, X, ChevronRight, CheckCircle2, CloudUpload, Mail, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import API from '../services/api';
+import API from './services/api';
 
 const DeveloperConsole = () => {
   const [data, setData] = useState({ 
