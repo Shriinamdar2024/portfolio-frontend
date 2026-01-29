@@ -25,7 +25,7 @@ const PortfolioHome = () => {
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
-        const res = await axios.get('https://shrirupportfolio.onrender.com/api');
+        const res = await axios.get('https://shrirupportfolio.onrender.com/api/portfolio');
         const d = res.data;
         setData({
           ...d,
