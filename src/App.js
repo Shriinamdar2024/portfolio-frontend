@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import axios from 'axios';
 import PortfolioHome from './pages/PortfolioHome'; 
 import DeveloperConsole from './components/admin/DeveloperConsole';
 import AdminLogin from './pages/AdminLogin';

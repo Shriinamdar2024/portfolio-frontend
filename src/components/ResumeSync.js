@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Upload, CheckCircle, RefreshCcw, AlertCircle, FileCode, Loader2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
 const ResumeSync = ({ onSyncSuccess }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);

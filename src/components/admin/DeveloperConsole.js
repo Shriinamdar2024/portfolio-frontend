@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { 
-  Save, Plus, Trash2, LayoutDashboard, User, 
+  Save, Plus, Trash2, User, 
   Briefcase, Rocket, Globe, Github, Image as ImageIcon,
-  GraduationCap, FileText, Code2, Link as LinkIcon, Sparkles,
-  Terminal, ShieldCheck, Cpu, X, ChevronRight, CheckCircle2, CloudUpload, Mail, Activity
+  GraduationCap, Code2, Link as LinkIcon, 
+  Terminal,  Cpu, X, CloudUpload, Mail, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import API from '../../services/api';
