@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
-
+import API from '../api'
 const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -12,7 +12,7 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
       // You'll need to create this auth/login endpoint in your backend
-      const res = await axios.post('http://localhost:5000/api/auth/login', { password });
+      const res = await API.post('/auth/login', { password });
       localStorage.setItem('adminToken', res.data.token);
       navigate('/dev'); // Redirect to your Developer Console
     } catch (err) {

@@ -9,6 +9,7 @@ import {
    Terminal, Layout, Cpu, Sun, Moon,
 } from 'lucide-react';
 import { motion,  useScroll, useSpring } from 'framer-motion';
+import API from '../api';
 
 const PortfolioHome = () => {
   const [data, setData] = useState(null);
@@ -25,7 +26,7 @@ const PortfolioHome = () => {
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
-        const res = await axios.get('https://shrirupportfolio.onrender.com/api/portfolio');
+        const res = await API.get('/portfolio');
         const d = res.data;
         setData({
           ...d,

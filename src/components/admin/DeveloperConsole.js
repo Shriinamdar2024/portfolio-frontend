@@ -7,6 +7,7 @@ import {
   Terminal, ShieldCheck, Cpu, X, ChevronRight, CheckCircle2, CloudUpload, Mail, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import API from '../api';
 
 const DeveloperConsole = () => {
   const [data, setData] = useState({ 
@@ -21,7 +22,7 @@ const DeveloperConsole = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/portfolio');
+      const res = await API.get('/portfolio');
       setData({
         ...res.data,
         socials: res.data.socials || { github: '', linkedin: '', twitter: '' },
@@ -110,7 +111,7 @@ const DeveloperConsole = () => {
     });
 
     try {
-      await axios.post('http://localhost:5000/api/portfolio/manual-update', formData, {
+      await API.post('/portfolio/manual-update', formData, {
         headers: { 
           Authorization: `Bearer ${token}`, 
           'Content-Type': 'multipart/form-data' 
