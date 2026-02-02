@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, ShieldCheck, Cpu, Fingerprint, Terminal } from 'lucide-react';
+import { Lock, ShieldCheck, Cpu, Fingerprint, Terminal, Eye, EyeOff, Activity, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import API from '../services/api';
 
 const AdminLogin = () => {
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,82 +20,105 @@ const AdminLogin = () => {
       localStorage.setItem('adminToken', res.data.token);
       navigate('/dev');
     } catch (err) {
-      setError("UNAUTHORIZED_ACCESS: KEY_REJECTED");
+      setError("CRITICAL_ERROR: ACCESS_DENIED_BY_CORE");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen bg-[#02010a] flex items-center justify-center p-6 relative overflow-hidden font-sans">
-      {/* Background Tech Effects */}
+    <div className="h-screen bg-[#010103] flex items-center justify-center p-6 relative overflow-hidden font-sans">
+      {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(79,70,229,0.1),_transparent_70%)]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[120px] animate-pulse" />
+        {/* CRT Scanline Effect */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-md w-full relative z-10"
       >
-        {/* Decorative Corner Accents */}
-        <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-indigo-500 rounded-tl-lg" />
-        <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-indigo-500 rounded-br-lg" />
-
-        <div className="bg-slate-900/40 border border-white/10 p-8 sm:p-10 rounded-[2.5rem] backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+        {/* Futuristic Border Frame */}
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-[3rem] blur opacity-75" />
+        
+        <div className="relative bg-[#0a0a0f]/80 border border-white/10 p-8 sm:p-10 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
           
-          {/* Animated Header Icon */}
-          <div className="relative w-24 h-24 mx-auto mb-8">
+          {/* Header Section */}
+          <div className="relative w-28 h-28 mx-auto mb-6">
+            <motion.div 
+              animate={{ rotate: -360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 border border-dashed border-indigo-500/40 rounded-full"
+            />
             <motion.div 
               animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 border-2 border-dashed border-indigo-500/30 rounded-full"
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-3 border-2 border-indigo-500/20 rounded-full border-t-indigo-500"
             />
-            <div className="absolute inset-2 bg-indigo-500/10 rounded-full flex items-center justify-center border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+            <div className="absolute inset-6 bg-indigo-600/10 rounded-full flex items-center justify-center border border-indigo-500/30 backdrop-blur-md">
               {loading ? (
-                <Cpu className="text-indigo-400 animate-pulse" size={40} />
+                <Activity className="text-indigo-400 animate-pulse" size={32} />
+              ) : error ? (
+                <ShieldAlert className="text-red-500 animate-bounce" size={32} />
               ) : (
-                <Lock className="text-indigo-500" size={36} />
+                <Lock className="text-indigo-400" size={32} />
               )}
             </div>
           </div>
           
-          <div className="text-center space-y-2 mb-10">
-            <h2 className="text-3xl font-black text-white tracking-tighter uppercase">Nexus Core</h2>
-            <div className="flex items-center justify-center gap-2">
-               <Terminal size={12} className="text-indigo-500" />
-               <p className="text-indigo-400/70 text-[10px] font-mono font-bold tracking-[0.3em] uppercase">Auth_Protocol_v3.0</p>
+          <div className="text-center space-y-3 mb-8">
+            <motion.h2 
+              initial={{ letterSpacing: "0.2em" }}
+              animate={{ letterSpacing: "0.1em" }}
+              className="text-2xl font-black text-white uppercase tracking-wider"
+            >
+              System Gateway
+            </motion.h2>
+            <div className="flex items-center justify-center gap-3">
+               <span className="h-px w-8 bg-indigo-500/30" />
+               <Terminal size={14} className="text-indigo-500" />
+               <span className="text-indigo-400/60 text-[10px] font-mono font-bold uppercase tracking-widest">Secure_Protocol</span>
+               <span className="h-px w-8 bg-indigo-500/30" />
             </div>
           </div>
           
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-5">
             <div className="relative group">
-              <motion.div 
-                whileFocus={{ scale: 1.02 }}
-                className="relative"
-              >
-                <Fingerprint className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors" size={20} />
+              <motion.div whileTap={{ scale: 0.995 }}>
+                <Fingerprint className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                
                 <input 
-                  type="password" 
-                  placeholder="ENCRYPTION_KEY"
-                  className="w-full bg-black/40 border border-white/5 rounded-2xl pl-14 pr-5 py-5 text-white outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-mono tracking-widest placeholder:text-slate-700 placeholder:tracking-normal text-sm"
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="AUTHORIZATION_KEY"
+                  className="w-full bg-black/50 border border-white/5 rounded-2xl pl-14 pr-14 py-5 text-white outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono text-xs tracking-[0.3em] placeholder:tracking-normal placeholder:text-slate-600"
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </motion.div>
             </div>
             
-            <AnimatePresence>
+            <AnimatePresence mode='wait'>
               {error && (
                 <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-red-500/10 border border-red-500/20 rounded-xl p-3"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  className="bg-red-500/5 border-l-2 border-red-500/50 p-3 flex items-center gap-3"
                 >
-                  <p className="text-red-400 text-[10px] text-center font-bold font-mono tracking-wider">
+                  <ShieldAlert size={14} className="text-red-500" />
+                  <p className="text-red-400 text-[9px] font-black font-mono tracking-tighter uppercase">
                     {error}
                   </p>
                 </motion.div>
@@ -104,31 +128,37 @@ const AdminLogin = () => {
             <motion.button 
               type="submit" 
               disabled={loading}
-              whileHover={{ scale: 1.02, backgroundColor: '#4f46e5' }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="relative w-full overflow-hidden bg-indigo-600 text-white py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-500/10 flex items-center justify-center gap-3"
+              className="group relative w-full h-16 overflow-hidden rounded-2xl bg-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] text-white shadow-2xl shadow-indigo-500/20"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Decrypting...
-                </span>
-              ) : (
-                <>
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative flex items-center justify-center gap-3">
+                {loading ? (
+                  <Cpu className="animate-spin" size={18} />
+                ) : (
                   <ShieldCheck size={18} />
-                  Authorize Access
-                </>
-              )}
+                )}
+                <span>{loading ? "Decrypting..." : "Initialise Access"}</span>
+              </div>
             </motion.button>
           </form>
 
-          <p className="mt-8 text-center text-slate-600 text-[9px] font-bold uppercase tracking-widest">
-            Level 5 Security Clearance Required
-          </p>
+          <div className="mt-10 flex flex-col items-center gap-4">
+            <div className="flex gap-2">
+               {[...Array(3)].map((_, i) => (
+                 <motion.div 
+                   key={i}
+                   animate={{ opacity: [0.2, 1, 0.2] }}
+                   transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                   className="w-1.5 h-1.5 rounded-full bg-indigo-500/40"
+                 />
+               ))}
+            </div>
+            <p className="text-slate-600 text-[8px] font-bold uppercase tracking-[0.4em] text-center leading-loose">
+              Warning: Unauthorized access is logged <br /> & monitored by Nexus Security
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>
