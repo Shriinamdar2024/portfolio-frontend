@@ -7,11 +7,14 @@ import API from './services/api';
 
 // Secure Guard - Enhanced with state verification and history replacement
 const ProtectedRoute = ({ children }) => {
+  // We check for the token strictly
   const token = localStorage.getItem('adminToken');
   
-  // Basic security: Check if token exists and isn't just an empty string/null
-  if (!token || token === "undefined") {
-    // replace={true} prevents the user from clicking "Back" into the protected area
+  // If token is missing, or is the literal string "null"/"undefined" (common JS storage bugs)
+  const isAuthenticated = token && token !== "undefined" && token !== "null";
+
+  if (!isAuthenticated) {
+    // We use replace to ensure they can't go "Back" into the dev console
     return <Navigate to="/portal-access-secret" replace />;
   }
 
