@@ -4,10 +4,18 @@ import PortfolioHome from './pages/PortfolioHome';
 import DeveloperConsole from './components/admin/DeveloperConsole';
 import AdminLogin from './pages/AdminLogin';
 import API from './services/api';
-// Secure Guard
+
+// Secure Guard - Enhanced with state verification and history replacement
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken');
-  return token ? children : <Navigate to="/" />;
+  
+  // Basic security: Check if token exists and isn't just an empty string/null
+  if (!token || token === "undefined") {
+    // replace={true} prevents the user from clicking "Back" into the protected area
+    return <Navigate to="/portal-access-secret" replace />;
+  }
+
+  return children;
 };
 
 function App() {
@@ -46,6 +54,9 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        {/* Catch-all redirect for broken links */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
