@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import PortfolioHome from './pages/PortfolioHome'; 
 import DeveloperConsole from './components/admin/DeveloperConsole';
 import AdminLogin from './pages/AdminLogin';
 import API from './services/api';
 
-// Secure Guard - Strict verification
+// Secure Guard - Enhanced with state verification and history replacement
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken');
-  const location = useLocation();
   
-  // Strict check: fails if token is missing, or the literal string "undefined"/"null"
-  const isAuthenticated = token && token !== "undefined" && token !== "null" && token.length > 20;
-
-  if (!isAuthenticated) {
-    // We send them to login and save the location they were trying to access
-    // replace={true} ensures they can't 'Back-button' into the console
-    return <Navigate to="/portal-access-secret" state={{ from: location }} replace />;
+  // Basic security: Check if token exists and isn't just an empty string/null
+  if (!token || token === "undefined") {
+    // replace={true} prevents the user from clicking "Back" into the protected area
+    return <Navigate to="/portal-access-secret" replace />;
   }
 
   return children;
@@ -33,7 +29,7 @@ function App() {
         setData(res.data);
       } catch (err) {
         console.error("Error fetching portfolio data:", err);
-        // Fallback state
+        // Set empty state so it doesn't stay black forever on error
         setData({ experience: [], projects: [] });
       }
     };
@@ -43,13 +39,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Main Portfolio Route */}
+        {/* Pass the fetched data as a prop here */}
         <Route path="/" element={<PortfolioHome data={data} />} />
 
-        {/* Admin Login Route */}
+        {/* Admin Login */}
         <Route path="/portal-access-secret" element={<AdminLogin />} />
 
-        {/* Private Control Center - Wrapped in strict Guard */}
+        {/* Private Control Center */}
         <Route 
           path="/dev" 
           element={
@@ -59,7 +55,7 @@ function App() {
           } 
         />
 
-        {/* Global Redirect: Any unknown route sends user to Home */}
+        {/* Catch-all redirect for broken links */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

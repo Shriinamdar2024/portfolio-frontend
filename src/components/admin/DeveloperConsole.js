@@ -6,11 +6,9 @@ import {
   Terminal, Cpu, X, CloudUpload, Mail, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom'; // Requirement for security redirect
 import API from '../../services/api';
 
 const DeveloperConsole = () => {
-  const navigate = useNavigate(); // Hook for automated logout
   const [data, setData] = useState({ 
     fullName: '', bio: '', aboutMe: '', email: '', resumeUrl: '',
     socials: { github: '', linkedin: '', twitter: '' },
@@ -20,26 +18,9 @@ const DeveloperConsole = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('identity');
   const [newSkill, setNewSkill] = useState({ name: '', tempFile: null, preview: '' });
+  
+  // NEW: State for mobile sidebar visibility
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-  // --- SECURITY INTERCEPTOR START ---
-  // This tripwire monitors all backend responses. If a "401 Unauthorized" is detected, 
-  // the local session is wiped and the user is redirected.
-  useEffect(() => {
-    const interceptor = API.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('adminToken');
-          navigate('/admin'); 
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    return () => API.interceptors.response.eject(interceptor);
-  }, [navigate]);
-  // --- SECURITY INTERCEPTOR END ---
 
   const fetchData = async () => {
     try {
@@ -142,7 +123,7 @@ const DeveloperConsole = () => {
       fetchData(); 
     } catch (err) {
       console.error("Upload error:", err.response?.data || err.message);
-      alert("ERROR: Authorization Failed or Network Issue");
+      alert("ERROR: Check Console");
     }
   };
 
@@ -180,6 +161,7 @@ const DeveloperConsole = () => {
   return (
     <div className="min-h-screen bg-[#050505] text-slate-300 font-sans flex overflow-hidden selection:bg-indigo-500/30">
       
+      {/* SIDEBAR - Responsive Overlay & Toggle */}
       <AnimatePresence>
         {(isSidebarOpen || window.innerWidth > 1024) && (
           <motion.aside 
