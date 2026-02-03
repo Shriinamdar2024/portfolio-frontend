@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import PortfolioHome from './pages/PortfolioHome'; 
 import DeveloperConsole from './components/admin/DeveloperConsole';
 import AdminLogin from './pages/AdminLogin';
 import API from './services/api';
 
-// Secure Guard - Enhanced with state verification and history replacement
+// Secure Guard - Strict verification
 const ProtectedRoute = ({ children }) => {
-  // We check for the token strictly
   const token = localStorage.getItem('adminToken');
+  const location = useLocation();
   
-  // If token is missing, or is the literal string "null"/"undefined" (common JS storage bugs)
-  const isAuthenticated = token && token !== "undefined" && token !== "null";
+  // Strict check: fails if token is missing, or the literal string "undefined"/"null"
+  const isAuthenticated = token && token !== "undefined" && token !== "null" && token.length > 20;
 
   if (!isAuthenticated) {
-    // We use replace to ensure they can't go "Back" into the dev console
-    return <Navigate to="/portal-access-secret" replace />;
+    // We send them to login and save the location they were trying to access
+    // replace={true} ensures they can't 'Back-button' into the console
+    return <Navigate to="/portal-access-secret" state={{ from: location }} replace />;
   }
 
   return children;
@@ -32,7 +33,7 @@ function App() {
         setData(res.data);
       } catch (err) {
         console.error("Error fetching portfolio data:", err);
-        // Set empty state so it doesn't stay black forever on error
+        // Fallback state
         setData({ experience: [], projects: [] });
       }
     };
@@ -42,13 +43,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Pass the fetched data as a prop here */}
+        {/* Main Portfolio Route */}
         <Route path="/" element={<PortfolioHome data={data} />} />
 
-        {/* Admin Login */}
+        {/* Admin Login Route */}
         <Route path="/portal-access-secret" element={<AdminLogin />} />
 
-        {/* Private Control Center */}
+        {/* Private Control Center - Wrapped in strict Guard */}
         <Route 
           path="/dev" 
           element={
@@ -58,7 +59,7 @@ function App() {
           } 
         />
 
-        {/* Catch-all redirect for broken links */}
+        {/* Global Redirect: Any unknown route sends user to Home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
