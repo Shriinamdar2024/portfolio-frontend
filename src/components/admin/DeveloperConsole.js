@@ -6,11 +6,11 @@ import {
   Terminal, Cpu, X, CloudUpload, Mail, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom'; // Added for security redirect
+import { useNavigate } from 'react-router-dom'; // Requirement for security redirect
 import API from '../../services/api';
 
 const DeveloperConsole = () => {
-  const navigate = useNavigate(); // Added for security redirect
+  const navigate = useNavigate(); // Hook for automated logout
   const [data, setData] = useState({ 
     fullName: '', bio: '', aboutMe: '', email: '', resumeUrl: '',
     socials: { github: '', linkedin: '', twitter: '' },
@@ -23,14 +23,15 @@ const DeveloperConsole = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   // --- SECURITY INTERCEPTOR START ---
-  // This ensures that if the token expires, the session is wiped immediately
+  // This tripwire monitors all backend responses. If a "401 Unauthorized" is detected, 
+  // the local session is wiped and the user is redirected.
   useEffect(() => {
     const interceptor = API.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('adminToken');
-          navigate('/admin'); // Redirect to login on auth failure
+          navigate('/admin'); 
         }
         return Promise.reject(error);
       }
@@ -141,7 +142,7 @@ const DeveloperConsole = () => {
       fetchData(); 
     } catch (err) {
       console.error("Upload error:", err.response?.data || err.message);
-      alert("ERROR: Authorization Failed or Network Error");
+      alert("ERROR: Authorization Failed or Network Issue");
     }
   };
 
@@ -484,6 +485,7 @@ const DeveloperConsole = () => {
         </div>
       </main>
 
+      {/* MOBILE OVERLAY */}
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
