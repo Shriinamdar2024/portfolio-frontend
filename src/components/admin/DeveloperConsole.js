@@ -3,14 +3,14 @@ import {
   Save, Plus, Trash2, User, Menu,
   Briefcase, Rocket, Globe, Github, Image as ImageIcon,
   GraduationCap, Code2, Link as LinkIcon, 
-  Terminal, Cpu, X, CloudUpload, Mail, Activity, LogOut
+  Terminal, Cpu, X, CloudUpload, Mail, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Added for security redirect
 import API from '../../services/api';
 
 const DeveloperConsole = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Added for security redirect
   const [data, setData] = useState({ 
     fullName: '', bio: '', aboutMe: '', email: '', resumeUrl: '',
     socials: { github: '', linkedin: '', twitter: '' },
@@ -20,15 +20,25 @@ const DeveloperConsole = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('identity');
   const [newSkill, setNewSkill] = useState({ name: '', tempFile: null, preview: '' });
-  
-  // NEW: State for mobile sidebar visibility
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  // LOGOUT HANDLER
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    navigate('/portal-access-secret');
-  };
+  // --- SECURITY INTERCEPTOR START ---
+  // This ensures that if the token expires, the session is wiped immediately
+  useEffect(() => {
+    const interceptor = API.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem('adminToken');
+          navigate('/admin'); // Redirect to login on auth failure
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => API.interceptors.response.eject(interceptor);
+  }, [navigate]);
+  // --- SECURITY INTERCEPTOR END ---
 
   const fetchData = async () => {
     try {
@@ -49,16 +59,7 @@ const DeveloperConsole = () => {
     }
   };
 
-  useEffect(() => { 
-    fetchData(); 
-
-    // AUTO-LOGOUT ON TAB CLOSE
-    const handleTabClose = () => {
-        localStorage.removeItem('adminToken');
-    };
-    window.addEventListener('beforeunload', handleTabClose);
-    return () => window.removeEventListener('beforeunload', handleTabClose);
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const handleFileChange = (e, index, type) => {
     const file = e.target.files[0];
@@ -140,7 +141,7 @@ const DeveloperConsole = () => {
       fetchData(); 
     } catch (err) {
       console.error("Upload error:", err.response?.data || err.message);
-      alert("ERROR: Check Console");
+      alert("ERROR: Authorization Failed or Network Error");
     }
   };
 
@@ -178,7 +179,6 @@ const DeveloperConsole = () => {
   return (
     <div className="min-h-screen bg-[#050505] text-slate-300 font-sans flex overflow-hidden selection:bg-indigo-500/30">
       
-      {/* SIDEBAR - Responsive Overlay & Toggle */}
       <AnimatePresence>
         {(isSidebarOpen || window.innerWidth > 1024) && (
           <motion.aside 
@@ -224,15 +224,6 @@ const DeveloperConsole = () => {
                   {activeTab === item.id && <motion.div layoutId="activeTab" className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,1)]" />}
                 </button>
               ))}
-
-              {/* LOGOUT BUTTON */}
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-red-500/70 hover:text-red-500 hover:bg-red-500/5 transition-all mt-4 border border-transparent hover:border-red-500/10"
-              >
-                <LogOut size={18} />
-                <span className="text-xs font-bold uppercase tracking-widest">Terminate Session</span>
-              </button>
             </nav>
 
             <div className="bg-gradient-to-br from-indigo-500/10 to-transparent rounded-3xl p-6 border border-white/5">
@@ -493,7 +484,6 @@ const DeveloperConsole = () => {
         </div>
       </main>
 
-      {/* MOBILE OVERLAY */}
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
