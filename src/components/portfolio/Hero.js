@@ -1,127 +1,103 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, ArrowDownRight, Sparkles } from "lucide-react";
+import { Github, Linkedin, Download, Sparkles, ArrowRight, ExternalLink } from "lucide-react";
 
-const Hero = ({ name, bio, email, isDarkMode }) => {
-  // Animation for individual floating sparkles
-  const sparkleVariants = {
-    animate: (i) => ({
-      opacity: [0.2, 0.8, 0.2],
-      scale: [1, 1.5, 1],
-      y: [0, -20, 0],
-      transition: {
-        duration: 3 + i,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
-    }),
+const Hero = ({ name, bio, resumeUrl }) => {
+  // Animation variants for a staggered entrance
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2, delayChildren: 0.3 }
+    }
+  };
+
+  const item = {
+    hidden: { y: 30, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
   };
 
   return (
-    <section className="relative w-full flex flex-col items-center justify-center overflow-hidden py-20">
-      
-      {/* 1. DYNAMIC SPARKLE FIELD */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            custom={i}
-            variants={sparkleVariants}
-            animate="animate"
-            className="absolute text-indigo-500/30"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-            }}
-          >
-            <Sparkles size={Math.random() * 20 + 10} />
-          </motion.div>
-        ))}
+    <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden py-20 px-6">
+      {/* CREATIVE BACKGROUND ELEMENTS */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-center z-10 space-y-10"
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="text-center z-10 max-w-5xl"
       >
-        {/* Status Badge with Sparkle Accent */}
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="flex justify-center"
-        >
-          <div className={`inline-flex items-center gap-3 px-4 py-2 rounded-full border ${
-            isDarkMode ? "border-white/5 bg-white/5" : "border-indigo-100 bg-indigo-50/50"
-          } backdrop-blur-md`}>
+        {/* Status Badge */}
+        <motion.div variants={item} className="flex justify-center mb-10">
+          <div className="group flex items-center gap-3 px-5 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/5 backdrop-blur-md hover:border-indigo-500/40 transition-all cursor-default">
             <Sparkles size={14} className="text-indigo-400 animate-pulse" />
-            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDarkMode ? "text-indigo-300" : "text-indigo-600"}`}>
-              Nexus System Active
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-300">
+              System_Identity_Verified
             </span>
           </div>
         </motion.div>
 
-        {/* Main Title with Sparkle 'I' or Dot */}
-        <div className="relative inline-block">
-          <h1 className={`text-7xl md:text-[10rem] font-black tracking-tighter leading-none ${isDarkMode ? "text-white" : "text-slate-900"}`}>
-            {name?.split(" ")[0]}
-            <span className="relative text-indigo-500">
-              .
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="absolute -top-4 -right-8 text-indigo-400/50"
-              >
-                <Sparkles size={40} />
-              </motion.div>
-            </span>
-          </h1>
-        </div>
-
-        {/* Bio Text */}
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className={`max-w-2xl mx-auto text-lg md:text-xl ${isDarkMode ? "text-slate-400" : "text-slate-600"} font-light leading-relaxed`}
+        {/* FULL NAME - Removed the split logic to show full name from backend */}
+        <motion.h1 
+          variants={item}
+          className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter text-white mb-8 leading-[0.85] select-none"
         >
-          {bio || "Engineer of elegant digital solutions and high-performance system architectures."}
+          {name || "DEVELOPER"}
+          <span className="text-indigo-500">.</span>
+        </motion.h1>
+
+        {/* BIO */}
+        <motion.p 
+          variants={item}
+          className="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 font-light leading-relaxed mb-12"
+        >
+          {bio || "Crafting high-performance digital architectures with the MERN stack and modern cloud solutions."}
         </motion.p>
 
-        {/* Call to Action & Socials */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-6">
-          <div className="flex items-center gap-3">
+        {/* ACTION AREA */}
+        <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-6">
+          
+          {/* ANIMATED DOWNLOAD BUTTON */}
+          <motion.a
+            href={resumeUrl} // This comes from your backend portfolio data
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="group relative flex items-center gap-3 px-10 py-5 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-widest overflow-hidden transition-all shadow-[0_20px_40px_rgba(255,255,255,0.1)]"
+          >
+            <div className="absolute inset-0 bg-indigo-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            <Download size={18} className="relative z-10 group-hover:text-white transition-colors" />
+            <span className="relative z-10 group-hover:text-white transition-colors">Download Resume</span>
+            <ArrowRight size={18} className="relative z-10 group-hover:text-white group-hover:translate-x-1 transition-all" />
+          </motion.a>
+
+          {/* SOCIAL DOCK */}
+          <div className="flex items-center gap-4">
             {[
               { icon: Github, href: "https://github.com/Shriinamdar2024" },
-              { icon: Linkedin, href: "https://www.linkedin.com/in/shrirup-inamdar-179b98328" },
-              { icon: Mail, href: `mailto:${email}` }
+              { icon: Linkedin, href: "https://www.linkedin.com/in/shrirup-inamdar-179b98328" }
             ].map((social, i) => (
               <motion.a
                 key={i}
-                whileHover={{ y: -5, backgroundColor: "rgba(99, 102, 241, 0.1)" }}
                 href={social.href}
-                className={`p-4 rounded-2xl border transition-all ${
-                  isDarkMode 
-                  ? "bg-[#0d0d12] border-white/5 text-slate-400 hover:text-white" 
-                  : "bg-white border-slate-200 text-slate-600"
-                }`}
+                target="_blank"
+                whileHover={{ y: -5, backgroundColor: "rgba(99, 102, 241, 0.1)" }}
+                className="p-4 rounded-2xl border border-white/5 bg-white/5 text-slate-400 hover:text-white hover:border-indigo-500/50 transition-all backdrop-blur-sm"
               >
-                <social.icon size={20} />
+                <social.icon size={22} />
               </motion.a>
             ))}
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="group relative flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold overflow-hidden"
-          >
-            {/* Sparkle background effect on button hover */}
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Sparkles size={16} className="relative z-10 group-hover:animate-spin" />
-            <span className="relative z-10 text-sm uppercase tracking-widest">Access Files</span>
-            <ArrowDownRight size={18} className="relative z-10" />
-          </motion.button>
-        </div>
+        </motion.div>
       </motion.div>
+
+      {/* Visual Accent: Bottom Gradient Shade */}
+      <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#050505] to-transparent pointer-events-none" />
     </section>
   );
 };
