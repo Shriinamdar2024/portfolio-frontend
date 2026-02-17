@@ -1,53 +1,129 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Github, Linkedin } from "lucide-react";
+import { Github, Linkedin, Mail, ArrowDownRight, Sparkles } from "lucide-react";
 
-const Hero = ({ name, bio }) => (
-  <section className="relative pt-32 pb-20 overflow-hidden">
-    {/* Animated Background Grid */}
-    <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+const Hero = ({ name, bio, email, isDarkMode }) => {
+  // Animation for individual floating sparkles
+  const sparkleVariants = {
+    animate: (i) => ({
+      opacity: [0.2, 0.8, 0.2],
+      scale: [1, 1.5, 1],
+      y: [0, -20, 0],
+      transition: {
+        duration: 3 + i,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    }),
+  };
 
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="text-center space-y-8"
-    >
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/5 text-indigo-400 text-xs font-medium uppercase tracking-widest">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-        </span>
-        Open for opportunities
+  return (
+    <section className="relative w-full flex flex-col items-center justify-center overflow-hidden py-20">
+      
+      {/* 1. DYNAMIC SPARKLE FIELD */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            custom={i}
+            variants={sparkleVariants}
+            animate="animate"
+            className="absolute text-indigo-500/30"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+            }}
+          >
+            <Sparkles size={Math.random() * 20 + 10} />
+          </motion.div>
+        ))}
       </div>
 
-      <h1 className="text-7xl md:text-9xl font-black tracking-tighter text-white">
-        {name?.split(" ")[0]}
-        <span className="text-gradient">.</span>
-      </h1>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-center z-10 space-y-10"
+      >
+        {/* Status Badge with Sparkle Accent */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="flex justify-center"
+        >
+          <div className={`inline-flex items-center gap-3 px-4 py-2 rounded-full border ${
+            isDarkMode ? "border-white/5 bg-white/5" : "border-indigo-100 bg-indigo-50/50"
+          } backdrop-blur-md`}>
+            <Sparkles size={14} className="text-indigo-400 animate-pulse" />
+            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDarkMode ? "text-indigo-300" : "text-indigo-600"}`}>
+              Nexus System Active
+            </span>
+          </div>
+        </motion.div>
 
-      <p className="max-w-xl mx-auto text-lg text-slate-400 leading-relaxed font-light">
-        {bio ||
-          "Building high-performance applications with the MERN stack and modern cloud architecture."}
-      </p>
-
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
-        <div className="flex gap-4">
-          <a
-            href="https://github.com/Shriinamdar2024"
-            className="p-3 glass-card rounded-full hover:border-indigo-500/50 transition-all"
-          >
-            <Github size={20} />
-          </a>
-          <a
-            href="https://www.linkedin.com/in/shrirup-inamdar-179b98328"
-            className="p-3 glass-card rounded-full hover:border-indigo-500/50 transition-all"
-          >
-            <Linkedin size={20} />
-          </a>
+        {/* Main Title with Sparkle 'I' or Dot */}
+        <div className="relative inline-block">
+          <h1 className={`text-7xl md:text-[10rem] font-black tracking-tighter leading-none ${isDarkMode ? "text-white" : "text-slate-900"}`}>
+            {name?.split(" ")[0]}
+            <span className="relative text-indigo-500">
+              .
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                className="absolute -top-4 -right-8 text-indigo-400/50"
+              >
+                <Sparkles size={40} />
+              </motion.div>
+            </span>
+          </h1>
         </div>
-      </div>
-    </motion.div>
-  </section>
-);
+
+        {/* Bio Text */}
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className={`max-w-2xl mx-auto text-lg md:text-xl ${isDarkMode ? "text-slate-400" : "text-slate-600"} font-light leading-relaxed`}
+        >
+          {bio || "Engineer of elegant digital solutions and high-performance system architectures."}
+        </motion.p>
+
+        {/* Call to Action & Socials */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-6">
+          <div className="flex items-center gap-3">
+            {[
+              { icon: Github, href: "https://github.com/Shriinamdar2024" },
+              { icon: Linkedin, href: "https://www.linkedin.com/in/shrirup-inamdar-179b98328" },
+              { icon: Mail, href: `mailto:${email}` }
+            ].map((social, i) => (
+              <motion.a
+                key={i}
+                whileHover={{ y: -5, backgroundColor: "rgba(99, 102, 241, 0.1)" }}
+                href={social.href}
+                className={`p-4 rounded-2xl border transition-all ${
+                  isDarkMode 
+                  ? "bg-[#0d0d12] border-white/5 text-slate-400 hover:text-white" 
+                  : "bg-white border-slate-200 text-slate-600"
+                }`}
+              >
+                <social.icon size={20} />
+              </motion.a>
+            ))}
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            className="group relative flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold overflow-hidden"
+          >
+            {/* Sparkle background effect on button hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Sparkles size={16} className="relative z-10 group-hover:animate-spin" />
+            <span className="relative z-10 text-sm uppercase tracking-widest">Access Files</span>
+            <ArrowDownRight size={18} className="relative z-10" />
+          </motion.button>
+        </div>
+      </motion.div>
+    </section>
+  );
+};
 
 export default Hero;
