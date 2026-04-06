@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../components/layout/Navbar";
-import Hero from "../components/portfolio/Hero";
-import { Badge } from "../components/ui/Badge";
+import { motion, useScroll, useSpring, AnimatePresence, useInView } from "framer-motion";
 import {
   Briefcase,
   GraduationCap,
   Github,
-  ChevronRight,
   Linkedin,
-  UserCheck,
   Mail,
-  Globe,
   Terminal,
   Layout,
   Cpu,
   Sun,
   Moon,
+  ExternalLink,
+  ArrowUpRight,
+  Code2,
   Sparkles,
 } from "lucide-react";
-import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
+import Navbar from "../components/layout/Navbar";
+import Hero from "../components/portfolio/Hero";
+import { Badge } from "../components/ui/Badge";
 import API from "../services/api";
 
 const PortfolioHome = () => {
@@ -53,100 +53,120 @@ const PortfolioHome = () => {
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
+  // Advanced Animation Variants
+  const revealVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1, 
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
+    }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
   return (
     <div
-      className={`${isDarkMode ? "bg-[#08080a] text-slate-300" : "bg-[#fcfcfd] text-slate-800"} min-h-screen font-sans selection:bg-indigo-500/30 overflow-x-hidden transition-colors duration-700`}
+      className={`${
+        isDarkMode ? "bg-[#0A0A0A] text-slate-300" : "bg-[#F5F5F7] text-slate-900"
+      } min-h-screen font-sans selection:bg-indigo-500/30 overflow-x-hidden transition-colors duration-500`}
     >
-      {/* 1. AnimatePresence for the Initial Loader */}
+      {/* 1. INITIAL LOADER - ENHANCED BIOMETRIC FEEL */}
       <AnimatePresence mode="wait">
         {!data && (
           <motion.div
             key="loader"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[200] bg-[#050505] flex items-center justify-center"
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-[#0A0A0A] flex flex-col items-center justify-center"
           >
-            <div className="flex flex-col items-center gap-6">
-              <motion.div
-                animate={{
-                  rotate: 360,
-                  borderRadius: ["20%", "20%", "50%", "50%", "20%"],
-                  scale: [1, 1.2, 1.2, 1, 1],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 2,
-                  ease: "easeInOut",
-                }}
-                className="w-16 h-16 border-t-4 border-indigo-500 border-r-4 border-r-transparent rounded-xl"
+            <div className="relative">
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="w-24 h-24 border-[1px] border-indigo-500/20 rounded-full"
               />
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-[10px] uppercase tracking-[0.5em] text-indigo-500 font-black animate-pulse"
-              >
-                System_Initializing...
-              </motion.span>
+              <motion.div 
+                animate={{ rotate: -360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 border-t-[1px] border-indigo-500 rounded-full"
+              />
+              <Code2 className="absolute inset-0 m-auto text-indigo-500" size={24} />
             </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-8 flex flex-col items-center gap-2"
+            >
+              <span className="text-[10px] uppercase tracking-[1em] text-indigo-500 font-bold ml-[1em]">
+                LOADING_SYSTEM
+              </span>
+              <div className="h-[1px] w-32 bg-white/10 overflow-hidden">
+                <motion.div 
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                  className="h-full w-full bg-indigo-500"
+                />
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Scroll Progress Bar */}
+      {/* SCROLL PROGRESS - SHARP GRADIENT */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 origin-left z-[100]"
+        className="fixed top-0 left-0 right-0 h-[2px] bg-indigo-500 origin-left z-[110] shadow-[0_0_10px_rgba(99,102,241,0.5)]"
         style={{ scaleX }}
       />
 
-      {/* Theme Toggle Button with AnimatePresence for Icons */}
+      {/* THEME TOGGLE - MINIMALIST FLOATING */}
       <motion.button
-        whileHover={{ scale: 1.1, rotate: 15 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
         whileTap={{ scale: 0.9 }}
         onClick={toggleTheme}
-        className={`fixed top-24 right-8 z-50 p-4 rounded-2xl shadow-2xl backdrop-blur-xl border ${isDarkMode ? "bg-white/5 border-white/10 text-yellow-400" : "bg-black/5 border-black/10 text-indigo-600"}`}
+        className={`fixed top-8 right-8 z-50 p-4 rounded-xl border transition-all duration-300 ${
+          isDarkMode 
+            ? "bg-white/5 border-white/10 text-yellow-400 hover:bg-white/10" 
+            : "bg-black/5 border-black/10 text-indigo-600 hover:bg-black/10"
+        } backdrop-blur-md`}
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={isDarkMode ? "moon" : "sun"}
-            initial={{ y: 10, opacity: 0, rotate: -45 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            exit={{ y: -10, opacity: 0, rotate: 45 }}
-            transition={{ duration: 0.2 }}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -10, opacity: 0 }}
           >
-            {isDarkMode ? (
-              <Sun size={22} fill="currentColor" />
-            ) : (
-              <Moon size={22} fill="currentColor" />
-            )}
+            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
           </motion.div>
         </AnimatePresence>
       </motion.button>
 
-      {/* Professional Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none -z-10">
-        <div
-          className={`absolute top-0 left-1/4 w-[500px] h-[500px] ${isDarkMode ? "bg-indigo-600/10" : "bg-indigo-400/5"} blur-[120px] rounded-full`}
-        />
-        <div
-          className={`absolute bottom-0 right-1/4 w-[500px] h-[500px] ${isDarkMode ? "bg-purple-600/10" : "bg-purple-400/5"} blur-[120px] rounded-full`}
-        />
-        <div
-          className={`absolute inset-0 ${isDarkMode ? "bg-[radial-gradient(#ffffff03_1px,transparent_1px)]" : "bg-[radial-gradient(#00000005_1px,transparent_1px)]"} [background-size:40px_40px]`}
-        />
+      {/* AMBIENT BACKGROUND - REDUCED MOTION FOR PERFORMANCE */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className={`absolute top-[-20%] left-[-10%] w-[70%] h-[70%] ${isDarkMode ? "bg-indigo-500/5" : "bg-indigo-200/20"} blur-[120px] rounded-full`} />
+        <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] ${isDarkMode ? "bg-purple-500/5" : "bg-purple-200/20"} blur-[120px] rounded-full`} />
       </div>
 
       {data && (
         <>
           <Navbar onSync={setData} isDarkMode={isDarkMode} />
 
-          <main className="max-w-7xl mx-auto px-6 sm:px-12 space-y-32 md:space-y-48 pb-32 relative z-10">
-            {/* HERO SECTION */}
-            <section className="pt-24 min-h-[95vh] flex flex-col justify-center items-center">
+          <main className="max-w-7xl mx-auto px-6 sm:px-12 space-y-32 md:space-y-64 pb-32">
+            
+            {/* HERO SECTION - ARCHITECTURAL PRECISION */}
+            <section className="pt-20 min-h-[90vh] flex flex-col justify-center relative">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               >
                 <Hero
                   name={data.fullName}
@@ -155,221 +175,173 @@ const PortfolioHome = () => {
                   isDarkMode={isDarkMode}
                 />
               </motion.div>
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 2,
-                  ease: "easeInOut",
-                }}
-                className="mt-20 flex flex-col items-center gap-4"
-              >
-                <span className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40">
-                  Scroll to explore
-                </span>
-                <div
-                  className={`w-[2px] h-16 bg-gradient-to-b ${isDarkMode ? "from-indigo-500" : "from-indigo-300"} to-transparent`}
-                />
-              </motion.div>
+              
+              <div className="absolute bottom-10 left-0 w-full hidden md:flex items-center gap-6">
+                <div className={`h-[1px] flex-grow ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`} />
+                <span className="text-[9px] uppercase tracking-[0.8em] font-bold opacity-30">Scroll_To_Explore</span>
+                <div className={`h-[1px] flex-grow ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`} />
+              </div>
             </section>
 
-            {/* ORGANIZED BENTO GRID */}
-            <motion.section
-              id="about"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="grid lg:grid-cols-4 gap-6"
-            >
+            {/* BENTO GRID ABOUT - SHARP EDGES & STRUCTURE */}
+            <section id="about" className="grid lg:grid-cols-12 gap-8">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                className={`${isDarkMode ? "bg-[#0d0d12]/80 border-white/5" : "bg-white border-slate-200 shadow-xl"} border p-8 md:p-14 rounded-[3rem] lg:col-span-3 flex flex-col justify-center group relative overflow-hidden backdrop-blur-sm`}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={revealVariants}
+                className={`lg:col-span-8 p-12 md:p-20 border transition-all duration-500 ${
+                  isDarkMode ? "bg-neutral-900/40 border-white/5 hover:border-indigo-500/30" : "bg-white border-neutral-200 shadow-xl shadow-neutral-200/50"
+                } relative overflow-hidden group`}
               >
-                <div className="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full group-hover:bg-indigo-500/20 transition-colors" />
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="p-2 bg-indigo-500/10 rounded-lg text-indigo-500">
-                    <UserCheck size={20} />
-                  </span>
-                  <span className="text-[10px] uppercase tracking-[0.5em] text-indigo-500 font-black">
-                    Identity_Brief
-                  </span>
+                <div className="flex items-center gap-3 mb-12">
+                   <div className="h-1 w-12 bg-indigo-500" />
+                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Identity_Brief</span>
                 </div>
-                <h2
-                  className={`text-4xl md:text-7xl font-bold ${isDarkMode ? "text-white" : "text-slate-900"} mb-8 leading-[1.05] tracking-tight`}
-                >
-                  Crafting{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 italic font-serif">
-                    seamless
-                  </span>{" "}
-                  digital experiences.
+                <h2 className={`text-4xl md:text-6xl font-bold ${isDarkMode ? "text-white" : "text-black"} mb-12 leading-[1.1] tracking-tight`}>
+                  Engineering <span className="text-indigo-500">Functional</span> Digital Products with Scale.
                 </h2>
-                <p
-                  className={`${isDarkMode ? "text-slate-400" : "text-slate-600"} text-lg md:text-2xl font-light leading-relaxed max-w-3xl`}
-                >
-                  {data.aboutMe ||
-                    "I bridge the gap between complex backend logic and beautiful, functional user interfaces."}
+                <p className={`text-lg md:text-xl font-light leading-relaxed max-w-2xl ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
+                  {data.aboutMe}
                 </p>
+                <ArrowUpRight className="absolute top-12 right-12 opacity-5 group-hover:opacity-100 group-hover:text-indigo-500 transition-all duration-700" size={48} />
               </motion.div>
 
-              <div className="grid grid-cols-1 gap-6">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-indigo-600 rounded-[2.5rem] p-10 flex flex-col justify-between text-white overflow-hidden relative group shadow-2xl shadow-indigo-500/30"
+              <div className="lg:col-span-4 grid gap-8">
+                <motion.div 
+                  variants={revealVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className={`p-12 flex flex-col justify-between border transition-all duration-500 ${
+                    isDarkMode ? "bg-indigo-600 text-white" : "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                  }`}
                 >
-                  <Layout className="absolute -right-6 -bottom-6 w-36 h-36 opacity-10 -rotate-12 group-hover:rotate-0 transition-transform duration-1000" />
-                  <span className="text-[10px] uppercase tracking-widest font-black opacity-80">
-                    Portfolio_Size
-                  </span>
-                  <div className="text-5xl md:text-6xl font-black tracking-tighter">
-                    {data.projects.length}+{" "}
-                    <span className="text-xl opacity-60">Works</span>
+                  <Layout size={32} strokeWidth={1.5} />
+                  <div>
+                    <div className="text-7xl font-black mb-2 tracking-tighter">{data.projects.length}</div>
+                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-80">Completed_Deployments</p>
                   </div>
                 </motion.div>
 
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className={`${isDarkMode ? "bg-[#0d0d12] border-white/5" : "bg-white border-slate-200 shadow-xl"} border rounded-[2.5rem] p-10 flex flex-col justify-between group transition-all`}
+                <motion.div 
+                  variants={revealVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className={`p-12 border transition-all duration-500 ${
+                    isDarkMode ? "bg-neutral-900/40 border-white/5" : "bg-white border-neutral-200"
+                  }`}
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
-                    <Cpu size={24} />
-                  </div>
-                  <div>
-                    <span
-                      className={`text-[10px] uppercase tracking-widest font-black ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}
-                    >
-                      Stack_Complexity
-                    </span>
-                    <div
-                      className={`text-4xl font-black ${isDarkMode ? "text-white" : "text-slate-900"} tracking-tighter`}
-                    >
-                      {data.skills.length} Technologies
-                    </div>
-                  </div>
+                  <Cpu size={32} className="text-indigo-500 mb-10" strokeWidth={1.5} />
+                  <div className="text-4xl font-black mb-2 tracking-tighter text-indigo-500">{data.skills.length}+</div>
+                  <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-500">Technical_Capabilities</p>
                 </motion.div>
               </div>
-            </motion.section>
+            </section>
 
-            {/* PROFESSIONAL TECH STACK */}
-            <section id="tech-stack" className="space-y-16">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                className="flex flex-col md:flex-row md:items-center gap-6 border-l-4 border-indigo-500 pl-8"
-              >
-                <h2
-                  className={`text-5xl md:text-8xl font-black tracking-tighter uppercase ${isDarkMode ? "text-white" : "text-slate-900"}`}
-                >
-                  Engine
-                </h2>
-                <p className="max-w-xs text-sm font-medium uppercase tracking-widest opacity-50">
-                  Tools and technologies that power my development workflow.
-                </p>
-              </motion.div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-5">
-                {data.skills.map((skill, index) => {
-                  const name = typeof skill === "string" ? skill : skill.name;
-                  const iconUrl =
-                    typeof skill === "object" ? skill.iconUrl : null;
-
-                  return (
+            {/* TECH STACK - TECHNICAL GRID */}
+            <section id="tech-stack" className="space-y-24">
+               <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-indigo-500/20 pb-12">
+                  <div className="space-y-4">
+                    <h3 className={`text-[10px] font-black uppercase tracking-[0.8em] ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>Core_Competencies</h3>
+                    <h2 className={`text-5xl md:text-8xl font-black tracking-tighter ${isDarkMode ? "text-white" : "text-black"}`}>TECH_STACK</h2>
+                  </div>
+                  <p className={`max-w-xs text-[10px] uppercase tracking-widest leading-loose opacity-50 mt-6 md:mt-0`}>
+                    Specialized in building high-performance, scalable web applications using the modern ecosystem.
+                  </p>
+               </div>
+               
+               <motion.div 
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-[1px] bg-indigo-500/10 border border-indigo-500/10 overflow-hidden"
+               >
+                  {data.skills.map((skill, index) => (
                     <motion.div
                       key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      whileHover={{ y: -8 }}
-                      className={`relative p-8 rounded-[2rem] overflow-hidden group border ${isDarkMode ? "bg-[#0d0d12]/50 border-white/5 hover:border-indigo-500/50" : "bg-white border-slate-100 shadow-lg hover:border-indigo-500/50"} transition-all text-center`}
+                      variants={revealVariants}
+                      whileHover={{ backgroundColor: isDarkMode ? "rgba(99, 102, 241, 0.1)" : "rgba(99, 102, 241, 0.05)" }}
+                      className={`p-10 ${isDarkMode ? "bg-[#0A0A0A]" : "bg-white"} flex flex-col items-center gap-6 group transition-all cursor-default`}
                     >
-                      <div className="relative z-10 flex flex-col items-center gap-5">
-                        <div className="w-16 h-16 flex items-center justify-center relative">
-                          <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full scale-0 group-hover:scale-100 transition-transform duration-500" />
-                          {iconUrl ? (
-                            <img
-                              src={iconUrl}
-                              alt={name}
-                              className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-500"
-                            />
-                          ) : (
-                            <Terminal size={32} className="text-indigo-500" />
-                          )}
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">
-                          {name}
-                        </span>
+                      <div className="relative">
+                        {skill.iconUrl ? (
+                          <img src={skill.iconUrl} alt={skill.name} className="w-12 h-12 object-contain filter grayscale group-hover:grayscale-0 transition-all duration-500" />
+                        ) : (
+                          <Terminal size={32} className="text-slate-500 group-hover:text-indigo-500 transition-colors" />
+                        )}
                       </div>
-                      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent translate-y-1 group-hover:translate-y-0 transition-transform" />
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 group-hover:text-indigo-500 transition-colors">
+                        {typeof skill === 'string' ? skill : skill.name}
+                      </span>
                     </motion.div>
-                  );
-                })}
-              </div>
+                  ))}
+               </motion.div>
             </section>
 
-            {/* PROJECT CATALOGUE */}
-            <section id="projects" className="space-y-20">
-              <div className="flex justify-between items-end">
-                <h2
-                  className={`text-5xl md:text-8xl font-black tracking-tighter ${isDarkMode ? "text-white" : "text-slate-900"}`}
-                >
-                  PROJECTS
-                </h2>
-                <div className="hidden md:block h-[2px] flex-1 mx-12 bg-indigo-500/10" />
-                <motion.div
-                  whileHover={{ x: 5 }}
-                  className="flex items-center gap-2 cursor-pointer group"
-                >
-                  <span className="text-xs font-black uppercase tracking-widest">
-                    View All
-                  </span>
-                  <ChevronRight className="text-indigo-500 group-hover:translate-x-1 transition-transform" />
-                </motion.div>
+            {/* PROJECTS - HIGH END SHOWCASE */}
+            <section id="projects" className="space-y-32">
+              <div className="space-y-4">
+                  <h2 className={`text-6xl md:text-9xl font-black tracking-tighter leading-none ${isDarkMode ? "text-white" : "text-black"}`}>SELECTED_</h2>
+                  <h2 className={`text-6xl md:text-9xl font-black tracking-tighter leading-none text-transparent stroke-text ${isDarkMode ? "text-white" : "text-black"}`} 
+                      style={{ WebkitTextStroke: isDarkMode ? '1px rgba(255,255,255,0.1)' : '1px rgba(0,0,0,0.1)' }}>
+                    WORKS.
+                  </h2>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-10 md:gap-16">
+              <div className="grid md:grid-cols-2 gap-16 lg:gap-24">
                 {data.projects.map((project, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true, margin: "-100px" }}
                     className="group"
                   >
-                    <div
-                      className={`relative aspect-[16/10] rounded-[3rem] overflow-hidden border-2 ${isDarkMode ? "border-white/5 bg-zinc-900" : "border-slate-100 bg-white shadow-2xl"} transition-all duration-700`}
-                    >
+                    <div className={`relative aspect-[16/10] overflow-hidden border ${isDarkMode ? "border-white/5" : "border-neutral-200"}`}>
                       <img
-                        src={
-                          project.coverImage ||
-                          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
-                        }
+                        src={project.coverImage || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}
                         alt={project.title}
-                        className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000"
+                        className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                      <div className="absolute inset-0 bg-indigo-600/0 group-hover:bg-indigo-600/10 transition-colors duration-500" />
+                      
+                      <div className="absolute top-6 right-6 flex gap-2">
+                        {project.githubLink && (
+                          <a href={project.githubLink} className="p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-black transition-all">
+                            <Github size={18} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
 
-                      <div className="absolute inset-0 flex flex-col justify-end p-10 md:p-14">
-                        <motion.h3 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tighter leading-none group-hover:translate-x-2 transition-transform duration-500">
-                          {project.title}
-                        </motion.h3>
-                        <div className="flex gap-4 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-4 transition-all duration-500">
-                          {project.liveLink && (
-                            <a
-                              href={project.liveLink}
-                              className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all"
-                            >
-                              <Globe size={14} /> Live Project
-                            </a>
-                          )}
-                          {project.githubLink && (
-                            <a
-                              href={project.githubLink}
-                              className="p-3 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white hover:text-black transition-all"
-                            >
-                              <Github size={20} />
-                            </a>
-                          )}
+                    <div className="mt-8 space-y-6">
+                      <div className="flex items-center gap-4">
+                        <span className="text-[10px] font-black text-indigo-500 tracking-widest">0{index + 1}</span>
+                        <div className="h-[1px] w-12 bg-indigo-500/20" />
+                        <div className="flex gap-2">
+                          {project.tags?.slice(0, 3).map((tag, i) => (
+                            <span key={i} className="text-[8px] font-bold uppercase tracking-widest opacity-40">{tag}</span>
+                          ))}
                         </div>
+                      </div>
+
+                      <div className="flex justify-between items-start">
+                        <h3 className={`text-3xl font-bold tracking-tight ${isDarkMode ? "text-white" : "text-black"}`}>
+                          {project.title}
+                        </h3>
+                        {project.liveLink && (
+                          <motion.a
+                            whileHover={{ x: 5, y: -5 }}
+                            href={project.liveLink}
+                            className={`p-2 border ${isDarkMode ? "border-white/10 text-white" : "border-black/10 text-black"} hover:bg-indigo-500 hover:border-indigo-500 transition-all`}
+                          >
+                            <ArrowUpRight size={20} />
+                          </motion.a>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -377,128 +349,56 @@ const PortfolioHome = () => {
               </div>
             </section>
 
-            {/* EXPERIENCE SECTION */}
-            <section className="grid lg:grid-cols-2 gap-20">
-              <div id="experience" className="space-y-16">
+            {/* EXPERIENCE & EDUCATION - SPLIT TECHNICAL VIEW */}
+            <section className="grid lg:grid-cols-2 gap-32">
+              <div id="experience" className="space-y-20">
                 <div className="flex items-center gap-6">
-                  <div className="p-5 bg-indigo-500 rounded-2xl shadow-lg shadow-indigo-500/20 text-white">
-                    <Briefcase size={30} />
-                  </div>
-                  <h2
-                    className={`text-4xl font-black uppercase tracking-tighter ${isDarkMode ? "text-white" : "text-slate-900"}`}
-                  >
-                    Experience
-                  </h2>
+                  <div className="h-[1px] w-16 bg-indigo-500" />
+                  <h2 className={`text-3xl font-black uppercase tracking-widest ${isDarkMode ? "text-white" : "text-black"}`}>Experience</h2>
                 </div>
 
-                <div className="space-y-6 relative">
+                <div className="space-y-16">
                   {data.experience.map((exp, i) => (
-                    <motion.div
-                      key={i}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      initial={{ opacity: 0, x: -30 }}
-                      viewport={{ once: true }}
-                      className="relative pl-20 group pb-10"
+                    <motion.div 
+                      key={i} 
+                      className="group relative"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
                     >
-                      <div className="absolute left-[23px] top-12 bottom-0 w-[2px] bg-gradient-to-b from-indigo-500/40 via-indigo-500/10 to-transparent group-last:hidden" />
-
-                      <div className="absolute left-0 top-0 z-10">
-                        <motion.div
-                          whileHover={{ rotate: 90, scale: 1.1 }}
-                          className={`w-12 h-12 flex items-center justify-center relative transition-all duration-500
-                            ${isDarkMode ? "bg-[#0d0d12] border-white/10" : "bg-white border-slate-200 shadow-xl"} 
-                            border-2 rounded-xl group-hover:border-indigo-500 overflow-hidden`}
-                        >
-                          {exp.companyLogo ? (
-                            <img
-                              src={exp.companyLogo}
-                              alt={exp.company}
-                              className="w-full h-full object-cover p-1"
-                            />
-                          ) : (
-                            <div className="flex flex-col items-center justify-center">
-                              <span className="text-[10px] font-black text-indigo-500">
-                                {exp.company?.substring(0, 2).toUpperCase()}
-                              </span>
-                              <Sparkles
-                                size={10}
-                                className="text-indigo-500/40"
-                              />
-                            </div>
-                          )}
-                        </motion.div>
-                      </div>
-
-                      <div
-                        className={`relative p-6 rounded-3xl transition-all duration-500 ${isDarkMode ? "hover:bg-white/[0.02]" : "hover:bg-indigo-50/30"}`}
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3">
-                          <span className="text-[11px] font-black text-indigo-500 uppercase tracking-widest px-3 py-1 bg-indigo-500/10 rounded-full w-fit">
-                            {exp.duration}
-                          </span>
-                          <p className="text-sm text-indigo-400 font-bold">
-                            {exp.company}
-                          </p>
-                        </div>
-                        <h4
-                          className={`text-2xl font-black ${isDarkMode ? "text-white" : "text-slate-900"} mb-4 group-hover:text-indigo-400 transition-colors`}
-                        >
-                          {exp.role}
-                        </h4>
-                        <p
-                          className={`${isDarkMode ? "text-slate-400" : "text-slate-600"} text-lg leading-relaxed font-light`}
-                        >
-                          {exp.description}
-                        </p>
-                      </div>
+                      <span className="text-[10px] font-bold text-indigo-500 tracking-[0.3em] block mb-4 uppercase">{exp.duration}</span>
+                      <h4 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-black"} mb-1`}>{exp.role}</h4>
+                      <p className="text-xs font-bold text-indigo-500/60 mb-6 tracking-widest uppercase">@ {exp.company}</p>
+                      <p className={`text-base font-light leading-relaxed max-w-xl ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
+                        {exp.description}
+                      </p>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* EDUCATION SECTION */}
-              <div id="education" className="space-y-16">
+              <div id="education" className="space-y-20">
                 <div className="flex items-center gap-6">
-                  <div className="p-5 bg-purple-500 rounded-2xl shadow-lg shadow-purple-500/20 text-white">
-                    <GraduationCap size={30} />
-                  </div>
-                  <h2
-                    className={`text-4xl font-black uppercase tracking-tighter ${isDarkMode ? "text-white" : "text-slate-900"}`}
-                  >
-                    Education
-                  </h2>
+                  <div className="h-[1px] w-16 bg-purple-500" />
+                  <h2 className={`text-3xl font-black uppercase tracking-widest ${isDarkMode ? "text-white" : "text-black"}`}>Education</h2>
                 </div>
+                
                 <div className="grid gap-8">
                   {data.education.map((edu, i) => (
                     <motion.div
                       key={i}
-                      whileHover={{ y: -5 }}
-                      className={`${isDarkMode ? "bg-[#0d0d12]/50 border-white/5 hover:border-purple-500/30" : "bg-white border-slate-100 shadow-xl"} p-10 rounded-[3rem] border transition-all relative overflow-hidden group`}
+                      whileHover={{ x: 10 }}
+                      className={`p-10 border transition-all ${
+                        isDarkMode ? "bg-neutral-900/20 border-white/5 hover:border-indigo-500/30" : "bg-white border-neutral-100 hover:shadow-xl"
+                      }`}
                     >
-                      <div className="absolute right-0 top-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
-                        <GraduationCap size={120} />
+                      <div className="flex justify-between items-center mb-8">
+                        <div className={`p-4 ${isDarkMode ? "bg-white/5" : "bg-indigo-50"} text-indigo-500`}>
+                          <GraduationCap size={20} />
+                        </div>
+                        <span className="text-sm font-black text-indigo-500">{edu.year}</span>
                       </div>
-                      <div className="flex justify-between items-start mb-8">
-                        <Badge className="bg-indigo-500 text-white border-none px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
-                          {edu.status}
-                        </Badge>
-                        <span
-                          className={`text-5xl font-black ${isDarkMode ? "text-white/5" : "text-black/5"} group-hover:text-indigo-500/10 transition-colors`}
-                        >
-                          {edu.grade}
-                        </span>
-                      </div>
-                      <h3
-                        className={`text-2xl font-black mb-2 ${isDarkMode ? "text-white" : "text-slate-900"}`}
-                      >
-                        {edu.degree}
-                      </h3>
-                      <p className="text-sm text-slate-500 mb-8 font-medium">
-                        {edu.college}
-                      </p>
-                      <div className="text-[10px] text-indigo-500 font-black tracking-[0.5em] uppercase px-4 py-2 bg-indigo-500/5 rounded-lg inline-block">
-                        {edu.year}
-                      </div>
+                      <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-black"}`}>{edu.degree}</h3>
+                      <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{edu.college}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -506,63 +406,57 @@ const PortfolioHome = () => {
             </section>
           </main>
 
-          <footer
-            className={`${isDarkMode ? "bg-[#050507]" : "bg-slate-50"} pt-32 pb-16 relative overflow-hidden transition-colors`}
-          >
+          {/* FOOTER - THE IMPACTFUL CLOSURE */}
+          <footer className={`${isDarkMode ? "bg-[#050505]" : "bg-white"} border-t ${isDarkMode ? "border-white/5" : "border-black/5"} pt-32 pb-16`}>
             <div className="max-w-7xl mx-auto px-8">
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center text-center space-y-12 mb-32"
-              >
-                <h2
-                  className={`text-6xl md:text-[12rem] font-black tracking-tighter uppercase leading-none ${isDarkMode ? "text-white" : "text-slate-900"}`}
+              <div className="flex flex-col items-center text-center space-y-12 mb-32">
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  className="flex items-center gap-4 text-indigo-500"
                 >
-                  GET IN{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
-                    TOUCH.
-                  </span>
-                </h2>
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  href={`mailto:${myEmail}`}
-                  className={`text-2xl md:text-5xl ${isDarkMode ? "text-slate-400" : "text-slate-500"} hover:text-indigo-500 transition-colors font-thin border-b-2 border-indigo-500/20 pb-4`}
+                  <Sparkles size={16} />
+                  <span className="text-[10px] font-black uppercase tracking-[0.5em]">Available_For_Projects</span>
+                </motion.div>
+                <motion.h2 
+                  whileInView={{ y: [20, 0], opacity: [0, 1] }}
+                  className={`text-[10vw] font-black tracking-tighter leading-none ${isDarkMode ? "text-white" : "text-black"}`}
                 >
-                  {myEmail}
-                </motion.a>
-              </motion.div>
+                  GET_IN_TOUCH.
+                </motion.h2>
+                <a 
+                  href={`mailto:${myEmail}`} 
+                  className={`group relative text-xl md:text-4xl font-light overflow-hidden transition-colors py-4 px-8 border ${isDarkMode ? 'border-white/10 hover:border-indigo-500' : 'border-black/10 hover:border-indigo-500'}`}
+                >
+                  <span className="relative z-10">{myEmail}</span>
+                  <motion.div 
+                    initial={{ y: "100%" }}
+                    whileHover={{ y: 0 }}
+                    className="absolute inset-0 bg-indigo-500 -z-0 transition-transform duration-300"
+                  />
+                </a>
+              </div>
 
-              <div className="flex flex-col md:flex-row items-center justify-between pt-16 border-t border-indigo-500/10 gap-10">
+              <div className="flex flex-col md:flex-row justify-between items-center pt-16 gap-8 opacity-50">
                 <div className="flex gap-12">
                   {[
-                    { icon: Github, link: data.socials.github, name: "Github" },
-                    {
-                      icon: Linkedin,
-                      link: data.socials.linkedin,
-                      name: "Linkedin",
-                    },
-                    { icon: Mail, link: `mailto:${myEmail}`, name: "Email" },
+                    { icon: Github, link: data.socials.github, label: "GH" },
+                    { icon: Linkedin, link: data.socials.linkedin, label: "LN" },
+                    { icon: Mail, link: `mailto:${myEmail}`, label: "EM" },
                   ].map((social, idx) => (
-                    <motion.a
+                    <a
                       key={idx}
-                      whileHover={{ y: -5, color: "#6366f1" }}
                       href={social.link}
                       target="_blank"
                       rel="noreferrer"
-                      className={`${isDarkMode ? "text-slate-600" : "text-slate-400"} transition-colors flex items-center gap-3`}
+                      className="text-[10px] font-bold tracking-widest hover:text-indigo-500 transition-colors"
                     >
-                      <social.icon size={18} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">
-                        {social.name}
-                      </span>
-                    </motion.a>
+                      {social.label}
+                    </a>
                   ))}
                 </div>
-                <p
-                  className={`text-[10px] font-black uppercase tracking-[0.6em] ${isDarkMode ? "text-slate-800" : "text-slate-300"}`}
-                >
-                  © {new Date().getFullYear()} {data.fullName.toUpperCase()} —
-                  DIGITAL_ENGINEER
+                <p className="text-[9px] font-bold uppercase tracking-[0.5em]">
+                  © {new Date().getFullYear()} — SYSTEM_V1.0
                 </p>
               </div>
             </div>
