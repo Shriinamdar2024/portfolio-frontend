@@ -18,7 +18,7 @@ const ResumeSync = ({ onSyncSuccess }) => {
     formData.append('resume', file);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/portfolio/sync', formData, {
+      const res = await axios.post('https://shrirupportfolio.onrender/api/portfolio/sync', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       
