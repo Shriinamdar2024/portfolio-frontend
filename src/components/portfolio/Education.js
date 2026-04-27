@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, Award, BookOpen, Star, ChevronDown } from "lucide-react";
+import { GraduationCap, Award, BookOpen, Star } from "lucide-react";
 
 const ACCENTS = [
   { from: "#7c3aed", to: "#ec4899", shadow: "rgba(124,58,237,0.45)" },
@@ -11,7 +11,7 @@ const ac = (i) => ACCENTS[i % ACCENTS.length];
 
 /* ─── Single education card ───────────────────────────────────── */
 const KnowledgeNode = ({ edu, index, isDarkMode }) => {
-  const [expanded, setExpanded] = useState(false);
+
   const a = ac(index);
 
   return (
@@ -32,7 +32,7 @@ const KnowledgeNode = ({ edu, index, isDarkMode }) => {
         }}
         onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 24px 80px rgba(0,0,0,0.5), 0 0 50px ${a.shadow}`; e.currentTarget.style.transform = "translateY(-6px) scale(1.01)"; e.currentTarget.style.borderColor = `${a.from}50`; }}
         onMouseLeave={e => { e.currentTarget.style.boxShadow = isDarkMode ? "0 20px 60px rgba(0,0,0,0.5)" : "0 8px 40px rgba(0,0,0,0.07)"; e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = isDarkMode ? "rgba(255,255,255,0.07)" : "#e8e0f4"; }}
-        onClick={() => setExpanded(p => !p)}
+
       >
         {/* Gradient top accent */}
         <div className="absolute top-0 inset-x-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${a.from}, ${a.to})` }} />
