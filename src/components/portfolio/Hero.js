@@ -36,8 +36,11 @@ function useTypewriter(roles, speed = 75, pause = 2000) {
   return display;
 }
 
-/* ─── Static particle data (generated once) ──────────────────── */
-const PARTICLES = Array.from({ length: 40 }, (_, i) => ({
+/* ─── Particle data — count scaled by device ─────────────────── */
+const PARTICLE_COUNT = typeof window !== "undefined"
+  ? (window.innerWidth < 768 ? 15 : window.innerWidth < 1024 ? 28 : 40)
+  : 40;
+const PARTICLES = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
   id: i,
   size: Math.random() * 2.5 + 0.5,
   top: `${Math.random() * 100}%`,
@@ -92,21 +95,15 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
     >
       {/* ── LAYER 0: Ambient animated mesh blobs ──────────────── */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
-        <motion.div
-          animate={{ scale: [1, 1.25, 1], x: [0, 60, 0], y: [0, -40, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        <div
           className="absolute -top-32 -left-32 w-[700px] h-[700px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)", filter: "blur(60px)" }}
         />
-        <motion.div
-          animate={{ scale: [1.2, 1, 1.2], x: [0, -40, 0], y: [0, 50, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        <div
           className="absolute top-1/2 right-0 w-[600px] h-[600px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)", filter: "blur(70px)" }}
         />
-        <motion.div
-          animate={{ scale: [1, 1.15, 1], y: [0, 30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        <div
           className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(236,72,153,0.10) 0%, transparent 70%)", filter: "blur(80px)" }}
         />

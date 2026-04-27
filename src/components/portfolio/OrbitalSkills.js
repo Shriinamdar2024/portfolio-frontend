@@ -45,16 +45,26 @@ const Starfield = () => {
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d"); let raf, stars = [];
+    const isMobile = window.innerWidth < 768;
+    // Cap canvas at logical pixels — never multiply by devicePixelRatio
+    // to avoid massive memory allocation on 3x retina phones
     const resize = () => {
       canvas.width  = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      stars = Array.from({ length: Math.floor(canvas.width * canvas.height / 5500) }, () => ({
+      canvas.height = Math.min(canvas.parentElement.clientHeight, 900); // cap height
+      const maxStars = isMobile ? 60 : 200;
+      stars = Array.from({ length: Math.min(Math.floor(canvas.width * canvas.height / 8000), maxStars) }, () => ({
         x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-        r: Math.random() * 1.3 + 0.2,   o: Math.random(),
-        s: Math.random() * 0.012 + 0.003,
+        r: Math.random() * 1.2 + 0.2,   o: Math.random(),
+        s: Math.random() * 0.01 + 0.003,
       }));
     };
-    const draw = () => {
+    // On mobile throttle to ~20fps to save battery/RAM
+    let lastT = 0;
+    const fpsInterval = isMobile ? 50 : 16; // ms
+    const draw = (t) => {
+      raf = requestAnimationFrame(draw);
+      if (t - lastT < fpsInterval) return;
+      lastT = t;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       stars.forEach(s => {
         s.o += s.s; if (s.o > 1 || s.o < 0) s.s = -s.s;
@@ -62,9 +72,8 @@ const Starfield = () => {
         ctx.fillStyle = "#fff"; ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
       });
-      raf = requestAnimationFrame(draw);
     };
-    window.addEventListener("resize", resize); resize(); draw();
+    window.addEventListener("resize", resize); resize(); raf = requestAnimationFrame(draw);
     return () => { window.removeEventListener("resize", resize); cancelAnimationFrame(raf); };
   }, []);
   return <canvas ref={ref} className="absolute inset-0 w-full h-full pointer-events-none opacity-60" />;
@@ -183,18 +192,17 @@ const OrbitRingSVG = ({ rx, ry, half }) => {
         zIndex: half === "back" ? 30 : 70 }}
       viewBox={`0 0 ${size} ${size}`}
     >
-      <defs>
-        <filter id={`glow-${half}`} x="-30%" y="-80%" width="160%" height="260%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <g transform={`translate(${center},${center}) rotate(${TILT_DEG})`}
-         filter={`url(#glow-${half})`}>
+      <g transform={`translate(${center},${center}) rotate(${TILT_DEG})`}>
+        {/* Glow layer (simulated with a thicker, semi-transparent path) */}
+        <path d={d} fill="none"
+          stroke={half === "back" ? "rgba(99,102,241,0.15)" : "rgba(99,102,241,0.25)"}
+          strokeWidth="6" />
+        
         {/* Solid base */}
         <path d={d} fill="none"
           stroke={half === "back" ? "rgba(99,102,241,0.2)" : "rgba(99,102,241,0.38)"}
           strokeWidth="1.5" />
+          
         {/* Animated glint */}
         <path d={d} fill="none"
           stroke={half === "back" ? "rgba(139,92,246,0.65)" : "rgba(139,92,246,0.92)"}
@@ -231,11 +239,15 @@ const OrbitalSkills = ({ skills = [], isDarkMode }) => {
   const ry = winW < 640 ?  44 : winW < 1024 ?  78 : 115;
   const planetSize = winW < 640 ? 110 : winW < 1024 ? 150 : 190;
 
-  const normalised = useMemo(() =>
-    skills?.length
+  const isMobile = winW < 768;
+
+  const normalised = useMemo(() => {
+    const all = skills?.length
       ? skills.map(s => typeof s === "string" ? { name: s, iconUrl: null } : { name: s?.name ?? "", iconUrl: s?.iconUrl ?? null })
-      : ["React","JavaScript","Node.js","MongoDB","TypeScript","Express","Git","Next.js","Docker","Python"].map(n => ({ name: n, iconUrl: null }))
-  , [skills]);
+      : ["React","JavaScript","Node.js","MongoDB","TypeScript","Express","Git","Next.js","Docker","Python"].map(n => ({ name: n, iconUrl: null }));
+    // Cap at 6 satellites on mobile to reduce useTransform subscriptions
+    return isMobile ? all.slice(0, 6) : all;
+  }, [skills, isMobile]);
 
   /* Stage height accounts for tilted orbit overhang */
   const stageH = Math.max(560, (rx + ry) * 1.05);
@@ -263,8 +275,8 @@ const OrbitalSkills = ({ skills = [], isDarkMode }) => {
           background:"radial-gradient(ellipse, rgba(99,102,241,0.06) 0%, transparent 70%)", filter:"blur(80px)" }} />
       </div>
 
-      {/* Meteors */}
-      {[0,1,2,3,4].map(i => (
+      {/* Meteors — skip on mobile to reduce paint work */}
+      {!isMobile && [0,1,2,3,4].map(i => (
         <div key={i} style={{
           position:"absolute", top:`${10+i*14}%`, left:`${65+i*6}%`,
           width:160, height:1.5, borderRadius:999, opacity:0,
