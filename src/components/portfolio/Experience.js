@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Briefcase, Clock, ChevronDown, Zap, MapPin } from "lucide-react";
+import { Briefcase, Clock, ChevronDown, Zap } from "lucide-react";
 
 /* ─── Accent palette per card index ──────────────────────────── */
 const ACCENTS = [

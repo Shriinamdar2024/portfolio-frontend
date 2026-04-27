@@ -31,13 +31,7 @@ const TILT_RAD = TILT_DEG * Math.PI / 180;
 const cosT = Math.cos(TILT_RAD); // ≈  0.7071
 const sinT = Math.sin(TILT_RAD); // ≈ -0.7071
 
-/* Apply 2D rotation matrix to a point on the ellipse */
-function tiltPoint(rawX, rawY) {
-  return {
-    x: rawX * cosT - rawY * sinT,
-    y: rawX * sinT + rawY * cosT,
-  };
-}
+
 
 /* ─── Starfield ───────────────────────────────────────────────── */
 const Starfield = () => {

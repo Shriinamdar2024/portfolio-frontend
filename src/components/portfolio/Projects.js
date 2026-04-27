@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Globe, Github, ArrowUpRight, X, ExternalLink, Layers, Zap } from "lucide-react";
 

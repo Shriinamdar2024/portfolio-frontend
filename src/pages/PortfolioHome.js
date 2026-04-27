@@ -19,6 +19,7 @@ import { motion, useScroll, useSpring, AnimatePresence, useInView, useMotionValu
 import API from "../services/api";
 
 /* ─── Animated counter hook (Left for potential future use) ────────────────────────────────── */
+// eslint-disable-next-line no-unused-vars
 function useCountUp(target, duration = 1200) {
   const [count, setCount] = React.useState(0);
   const ref               = useRef(null);

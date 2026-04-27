@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Github, Linkedin, Mail, ArrowRight, Sparkles, Code2, Zap, Globe } from "lucide-react";
 
 /* ─── Typewriter hook (unchanged logic) ───────────────────────── */
@@ -79,12 +79,7 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
   const firstName = name?.split(" ")[0] ?? "Developer";
   const lastName = name?.split(" ").slice(1).join(" ") ?? "";
 
-  /* Count-up for the XP badge */
-  const [xp, setXp] = useState(0);
-  useEffect(() => {
-    const timer = setInterval(() => setXp((v) => { if (v >= 1) { clearInterval(timer); return 1; } return v + 0.05; }), 50);
-    return () => clearInterval(timer);
-  }, []);
+
 
   return (
     <section
