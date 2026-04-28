@@ -29,15 +29,66 @@
 
 /* ── Base ───────────────────────────────────────────────────── */
 @layer base {
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    /* Prevent horizontal scroll on all pages */
+    overflow-x: hidden;
+  }
 
   body {
     font-family: 'Inter', sans-serif;
     @apply bg-[#08080a] text-slate-300 antialiased;
+    overflow-x: hidden;
+    /* Fluid base font using clamp */
+    font-size: clamp(14px, 1.5vw, 16px);
   }
 
   h1, h2, h3, h4, h5 {
     font-family: 'Outfit', sans-serif;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Responsive section container utility */
+  section {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* ── Responsive Container Utility ──────────────────────────── */
+.responsive-container {
+  width: 100%;
+  max-width: min(100%, 1400px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 4vw, 4rem);
+  padding-right: clamp(1rem, 4vw, 4rem);
+}
+
+/* ── Mobile-only: reduce heavy animations ──────────────────── */
+@media (max-width: 768px) {
+  /* Disable expensive blur filters on mobile */
+  .space-glow {
+    filter: blur(40px);
+  }
+  /* Reduce particle animations */
+  .particle {
+    animation-duration: 12s !important;
+  }
+}
+
+/* ── Reduced motion: disable all animations ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

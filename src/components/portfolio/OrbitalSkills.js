@@ -25,11 +25,16 @@ const getSkillLogo = (skillName) => {
 };
 const NEED_INVERT = ["next.js","nextjs","express","github"];
 
-/* ─── Tilt angle: -20° — gentle diagonal, fits all screen sizes ── */
-const TILT_DEG = -20;
-const TILT_RAD = TILT_DEG * Math.PI / 180;
-const cosT = Math.cos(TILT_RAD); // ≈  0.7071
-const sinT = Math.sin(TILT_RAD); // ≈ -0.7071
+/* ─── Cinematic Constants ─────────────────────────────────────── */
+const TILT_X = 30; // Perspective tilt (degrees)
+const ROT_Z = -15; // Slant/Tilt angle (degrees)
+const TILT_X_RAD = (TILT_X * Math.PI) / 180;
+const ROT_Z_RAD = (ROT_Z * Math.PI) / 180;
+
+const cosX = Math.cos(TILT_X_RAD);
+const sinX = Math.sin(TILT_X_RAD);
+const cosZ = Math.cos(ROT_Z_RAD);
+const sinZ = Math.sin(ROT_Z_RAD);
 
 
 
@@ -79,29 +84,60 @@ const Starfield = () => {
    - z-index ALWAYS > 50 (always in front of planet)
    - Scale & subtle opacity vary by depth for 3D realism
    ═══════════════════════════════════════════════════════════════ */
-const Satellite = ({ index, total, skill, progress, rx, ry }) => {
+const Satellite = ({ index, total, skill, progress, rx, ry, planetSize }) => {
   const [hovered, setHovered] = useState(false);
   const angleOffset = (360 / total) * index;
 
-  /* Current angle on the ellipse */
-  const angle = useTransform(progress, p => (p + angleOffset) % 360);
+  // Orbit rotation with subtle easing variance for "gravitational" feel
+  const angle = useTransform(progress, (p) => {
+    const raw = (p + angleOffset) % 360;
+    // Add a tiny bit of ease-in-out to the linear motion
+    const rad = (raw * Math.PI) / 180;
+    const smooth = raw + Math.sin(rad * 2) * 2; 
+    return smooth;
+  });
 
-  /* Raw position on un-tilted ellipse */
-  const rawX = useTransform(angle, a => rx * Math.cos(a * Math.PI / 180));
-  const rawY = useTransform(angle, a => ry * Math.sin(a * Math.PI / 180));
+  /* 3D Projection Math */
+  const angleRad = useTransform(angle, (a) => (a * Math.PI) / 180);
+  
+  // 1. Position on XZ plane (un-tilted orbit)
+  const px = useTransform(angleRad, (r) => rx * Math.cos(r));
+  const pz = useTransform(angleRad, (r) => rx * Math.sin(r)); // using rx for circular orbit in 3D
 
-  /* Apply tilt rotation */
-  const x = useTransform([rawX, rawY], ([px, py]) => px * cosT - py * sinT);
-  const y = useTransform([rawX, rawY], ([px, py]) => px * sinT + py * cosT);
+  // 2. Rotate around X axis (Tilt)
+  // x' = px
+  // y' = pz * sinX
+  // z' = pz * cosX
+  const y2 = useTransform(pz, (z) => z * sinX);
+  const z2 = useTransform(pz, (z) => z * cosX);
 
-  /* depth = sin(angle): +1 fully front, -1 fully back (before tilt) */
-  const depth = useTransform(angle, a => Math.sin(a * Math.PI / 180));
+  // 3. Rotate around Z axis (Cinematic Slant)
+  // screenX = x' * cosZ - y' * sinZ
+  // screenY = x' * sinZ + y' * cosZ
+  const x = useTransform([px, y2], ([xVal, yVal]) => xVal * cosZ - yVal * sinZ);
+  const y = useTransform([px, y2], ([xVal, yVal]) => xVal * sinZ + yVal * cosZ);
+  
+  // Depth Z determines scale, opacity, blur, and zIndex
+  // z2 ranges from -rx*cosX to rx*cosX
+  const maxDepth = rx * cosX;
+  const relativeDepth = useTransform(z2, [-maxDepth, maxDepth], [-1, 1]);
 
-  /* Scale: 0.75 (back) → 1.25 (front) */
-  const baseScale = useTransform(depth, [-1, 0, 1], [0.72, 0.9, 1.25]);
+  // Scale: 0.65 (back) → 1.3 (front)
+  const baseScale = useTransform(relativeDepth, [-1, 1], [0.65, 1.3]);
+  
+  // Opacity & Blur
+  const opacity = useTransform(relativeDepth, [-1, -0.3, 1], [0.4, 0.7, 1]);
+  const blur = useTransform(relativeDepth, [-1, 0, 1], ["2px", "0px", "0px"]);
+  
+  // Brightness & Glow
+  const brightness = useTransform(relativeDepth, [-1, 1], [0.5, 1.2]);
+  const boxShadow = useTransform(relativeDepth, [0.5, 1], [
+    "0 4px 18px rgba(0,0,0,0.5)",
+    "0 0 25px rgba(99,102,241,0.6), 0 0 50px rgba(99,102,241,0.2)"
+  ]);
 
-  /* Subtle opacity — never fully invisible */
-  const opacity = useTransform(depth, [-1, 0, 1], [0.55, 0.78, 1.0]);
+  // Occlusion: zIndex switches at z=0
+  const zIndex = useTransform(relativeDepth, (d) => (d > 0 ? 80 : 20));
 
   const iconUrl = skill.iconUrl || getSkillLogo(skill.name);
   const needInvert = NEED_INVERT.includes((skill.name || "").toLowerCase());
@@ -111,9 +147,10 @@ const Satellite = ({ index, total, skill, progress, rx, ry }) => {
       className="absolute flex flex-col items-center cursor-pointer"
       style={{
         x, y,
-        scale: hovered ? 1.45 : baseScale,
+        scale: hovered ? 1.5 : baseScale,
         opacity,
-        zIndex: 75,          /* always in front of planet (z:50) */
+        zIndex,
+        filter: useTransform(blur, (b) => `blur(${b})`),
         translateX: "-50%",
         translateY: "-50%",
       }}
@@ -121,34 +158,35 @@ const Satellite = ({ index, total, skill, progress, rx, ry }) => {
       onHoverEnd={() => setHovered(false)}
     >
       {/* Icon bubble */}
-      <div style={{
-        width: 52, height: 52, borderRadius: 16, display: "flex",
-        alignItems: "center", justifyContent: "center",
-        backdropFilter: "blur(12px)",
-        background: hovered ? "rgba(99,102,241,0.28)" : "rgba(8,8,20,0.88)",
-        border: hovered ? "1.5px solid rgba(139,92,246,0.95)" : "1.5px solid rgba(255,255,255,0.1)",
-        boxShadow: hovered
-          ? "0 0 26px rgba(99,102,241,0.85), 0 0 55px rgba(99,102,241,0.22)"
-          : "0 4px 18px rgba(0,0,0,0.7)",
-        transition: "background 0.2s, border 0.2s, box-shadow 0.2s",
-      }}>
+      <motion.div 
+        style={{
+          width: 56, height: 56, borderRadius: 18, display: "flex",
+          alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(12px)",
+          background: hovered ? "rgba(99,102,241,0.3)" : "rgba(8,8,25,0.9)",
+          border: hovered ? "2px solid rgba(139,92,246,1)" : "1.5px solid rgba(255,255,255,0.15)",
+          boxShadow,
+          filter: useTransform(brightness, (b) => `brightness(${b})`),
+          transition: "background 0.3s, border 0.3s, box-shadow 0.3s",
+        }}
+      >
         {iconUrl
-          ? <img src={iconUrl} alt={skill.name} style={{ width: 28, height: 28, objectFit: "contain" }}
+          ? <img src={iconUrl} alt={skill.name} style={{ width: 30, height: 30, objectFit: "contain" }}
               className={needInvert ? "invert brightness-200" : ""} />
-          : <Code2 size={20} style={{ color: "#818cf8" }} />}
-      </div>
+          : <Code2 size={24} style={{ color: "#818cf8" }} />}
+      </motion.div>
 
       {/* Tooltip */}
       <motion.div
-        animate={{ opacity: hovered ? 1 : 0, y: hovered ? -4 : 4 }}
-        transition={{ duration: 0.16 }}
-        style={{ position: "absolute", bottom: "calc(100% + 7px)", zIndex: 200, pointerEvents: "none" }}
+        animate={{ opacity: hovered ? 1 : 0, y: hovered ? -10 : 0 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        style={{ position: "absolute", bottom: "calc(100% + 10px)", zIndex: 200, pointerEvents: "none" }}
       >
         <div style={{
-          padding: "3px 11px", borderRadius: 9, fontSize: 9, fontWeight: 900,
-          letterSpacing: "0.32em", textTransform: "uppercase", whiteSpace: "nowrap",
-          background: "rgba(3,3,14,0.97)", border: "1px solid rgba(99,102,241,0.45)",
-          color: "#a5b4fc", boxShadow: "0 0 14px rgba(99,102,241,0.28)",
+          padding: "4px 12px", borderRadius: 10, fontSize: 10, fontWeight: 900,
+          letterSpacing: "0.2em", textTransform: "uppercase", whiteSpace: "nowrap",
+          background: "rgba(10,10,30,0.95)", border: "1px solid rgba(99,102,241,0.5)",
+          color: "#c7d2fe", boxShadow: "0 0 20px rgba(0,0,0,0.5)",
         }}>
           {skill.name}
         </div>
@@ -168,41 +206,45 @@ const Satellite = ({ index, total, skill, progress, rx, ry }) => {
    Front arc (lower half before rotation → bottom-left after -45°)
    is drawn in front of the planet (z:70).
    ═══════════════════════════════════════════════════════════════ */
-const OrbitRingSVG = ({ rx, ry, half }) => {
-  // "back" = upper semicircle (M rx,0 → through (0,-ry) → -rx,0)
-  // "front" = lower semicircle (M -rx,0 → through (0,+ry) → rx,0)
+const OrbitRingSVG = ({ rx, half }) => {
+  // rx is the 3D radius. In projection, it's tilted and slanted.
+  // The projected shape is an ellipse.
+  // Semi-major axis = rx
+  // Semi-minor axis = rx * sinX (apparent vertical height)
+  const ry_proj = rx * sinX;
+  
   const d = half === "back"
-    ? `M ${rx},0 A ${rx},${ry} 0 0,0 ${-rx},0`
-    : `M ${-rx},0 A ${rx},${ry} 0 0,0 ${rx},0`;
+    ? `M ${rx},0 A ${rx},${ry_proj} 0 0,0 ${-rx},0`
+    : `M ${-rx},0 A ${rx},${ry_proj} 0 0,0 ${rx},0`;
 
-  const size = (rx + 80) * 2;
+  const size = (rx + 100) * 2;
   const center = size / 2;
 
   return (
     <svg
       className="absolute pointer-events-none"
       style={{ width: size, height: size, left: "50%", top: "50%",
-        transform: "translate(-50%,-50%)", overflow: "visible",
+        transform: `translate(-50%,-50%) rotate(${ROT_Z}deg)`, overflow: "visible",
         zIndex: half === "back" ? 30 : 70 }}
       viewBox={`0 0 ${size} ${size}`}
     >
-      <g transform={`translate(${center},${center}) rotate(${TILT_DEG})`}>
-        {/* Glow layer (simulated with a thicker, semi-transparent path) */}
+      <g transform={`translate(${center},${center})`}>
+        {/* Glow layer */}
         <path d={d} fill="none"
-          stroke={half === "back" ? "rgba(99,102,241,0.15)" : "rgba(99,102,241,0.25)"}
-          strokeWidth="6" />
+          stroke={half === "back" ? "rgba(99,102,241,0.1)" : "rgba(99,102,241,0.25)"}
+          strokeWidth="8" />
         
         {/* Solid base */}
         <path d={d} fill="none"
-          stroke={half === "back" ? "rgba(99,102,241,0.2)" : "rgba(99,102,241,0.38)"}
+          stroke={half === "back" ? "rgba(99,102,241,0.15)" : "rgba(99,102,241,0.4)"}
           strokeWidth="1.5" />
           
         {/* Animated glint */}
         <path d={d} fill="none"
-          stroke={half === "back" ? "rgba(139,92,246,0.65)" : "rgba(139,92,246,0.92)"}
-          strokeWidth={half === "back" ? 2 : 2.5}
-          strokeDasharray="20 3000"
-          style={{ animation: `orb-dash ${half === "back" ? 38 : 32}s linear infinite` }} />
+          stroke={half === "back" ? "rgba(139,92,246,0.5)" : "rgba(139,92,246,0.9)"}
+          strokeWidth={half === "back" ? 1.5 : 2.5}
+          strokeDasharray="30 2000"
+          style={{ animation: `orb-dash ${half === "back" ? 45 : 35}s linear infinite` }} />
       </g>
     </svg>
   );
@@ -223,15 +265,24 @@ const OrbitalSkills = ({ skills = [], isDarkMode }) => {
 
   /* Always spinning */
   useAnimationFrame((_, delta) => {
-    let next = progress.get() + delta * 0.013;
+    let next = progress.get() + delta * 0.015; // Slightly faster for smoothness
     if (next >= 360) next -= 360;
     progress.set(next);
   });
 
-  /* Orbit radii — sized to fit screen at -20° tilt */
-  const rx = winW < 640 ? 140 : winW < 1024 ? 260 : 400;
-  const ry = winW < 640 ?  44 : winW < 1024 ?  78 : 115;
-  const planetSize = winW < 640 ? 110 : winW < 1024 ? 150 : 190;
+  /* ── ORBITAL PARAMETERS ── */
+  // Planet size
+  const planetSize = winW < 640 ? 120 : winW < 1024 ? 160 : 200;
+  
+  // Orbit Radius in 3D
+  // Rule: Front arc must be OUTSIDE planet.
+  // Front-most Y in projection = rx * sinX.
+  // We need rx * sinX > (planetSize/2 + satelliteHeight/2 + margin).
+  // sin(30deg) = 0.5.
+  // If planetSize=200, planetSize/2=100. SatHeight=56, SatHeight/2=28. Total=128.
+  // If rx=440, 440 * 0.5 = 220. Plenty of space.
+  // Mobile rx adjusted to 200 to ensure 200 * 0.5 = 100 > (60 + 28).
+  const rx = winW < 640 ? 200 : winW < 1024 ? 300 : 440;
 
   const isMobile = winW < 768;
 
@@ -244,7 +295,7 @@ const OrbitalSkills = ({ skills = [], isDarkMode }) => {
   }, [skills, isMobile]);
 
   /* Stage height accounts for tilted orbit overhang */
-  const stageH = Math.max(560, (rx + ry) * 1.05);
+  const stageH = Math.max(560, (rx + rx * cosX) * 1.05);
 
   return (
     <section id="skills" className="relative w-full overflow-hidden" style={{ background: "#020208" }}>
@@ -315,7 +366,7 @@ const OrbitalSkills = ({ skills = [], isDarkMode }) => {
         }} />
 
         {/* ── BACK arc — behind planet ─────────────────────── */}
-        <OrbitRingSVG rx={rx} ry={ry} half="back" />
+        <OrbitRingSVG rx={rx} half="back" />
 
         {/* ── PLANET at z:50 ──────────────────────────────── */}
         <motion.div
@@ -325,65 +376,53 @@ const OrbitalSkills = ({ skills = [], isDarkMode }) => {
           transition={{ duration:1.5, ease:[0.34,1.56,0.64,1] }}
           style={{ zIndex:50, width:planetSize, height:planetSize, flexShrink:0, position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}
         >
-          {/* Pulse auras */}
-          {[1.5,2.1,2.8].map((s,i) => (
-            <motion.div key={i}
-              animate={{ scale:[s, s+0.2, s], opacity:[0.1,0.02,0.1] }}
-              transition={{ duration:3.5+i, repeat:Infinity, ease:"easeInOut", delay:i*0.8 }}
-              style={{ position:"absolute", width:planetSize, height:planetSize, borderRadius:"50%",
-                border:"1px solid rgba(99,102,241,0.3)", pointerEvents:"none" }}
-            />
-          ))}
-
-          {/* Planet sphere */}
+          {/* Planet Body with Glow */}
           <div style={{
             width:planetSize, height:planetSize, borderRadius:"50%",
-            display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-            background:`radial-gradient(circle at 33% 27%, #3730a3, #1e1b4b 52%, #04040f 92%)`,
+            background:`radial-gradient(circle at 30% 30%, #4f46e5, #1e1b4b 60%, #020205 100%)`,
             boxShadow:[
-              `inset -${planetSize*.09}px -${planetSize*.09}px ${planetSize*.22}px rgba(0,0,0,0.96)`,
-              `inset ${planetSize*.045}px ${planetSize*.045}px ${planetSize*.14}px rgba(99,102,241,0.42)`,
-              `0 0 ${planetSize*.32}px rgba(99,102,241,0.58)`,
-              `0 0 ${planetSize*.65}px rgba(99,102,241,0.22)`,
+              `inset -10px -10px 30px rgba(0,0,0,0.8)`,
+              `inset 10px 10px 25px rgba(165,180,252,0.4)`,
+              `0 0 60px rgba(79,70,229,0.4)`,
             ].join(","),
-            position:"relative",
+            position:"relative", overflow:"hidden"
           }}>
-            {/* Specular */}
-            <div style={{ position:"absolute", borderRadius:"50%", background:"rgba(255,255,255,0.09)",
-              width:planetSize*.26, height:planetSize*.13, top:planetSize*.17, left:planetSize*.22,
-              filter:"blur(5px)", pointerEvents:"none" }} />
-            {/* Spinning scanning ring */}
-            <motion.div animate={{ rotate:360 }} transition={{ duration:7, repeat:Infinity, ease:"linear" }}
-              style={{ position:"absolute", inset:-7, borderRadius:"50%", border:"1px solid transparent",
-                borderTopColor:"rgba(139,92,246,0.75)", borderRightColor:"rgba(139,92,246,0.28)",
-                pointerEvents:"none" }} />
-            {/* Text */}
-            <div style={{ textAlign:"center", position:"relative", zIndex:1, padding:"0 8px", userSelect:"none" }}>
-              <Cpu size={winW<640?13:17} style={{ color:"#a5b4fc", margin:"0 auto 3px", opacity:.72 }} />
-              <span style={{ display:"block", fontSize:winW<640?7:9, fontWeight:900,
-                textTransform:"uppercase", letterSpacing:"0.42em", color:"rgba(165,180,252,0.8)" }}>
-                Developer
-              </span>
-              <span style={{ display:"block", fontFamily:"Outfit,sans-serif",
-                fontSize:winW<640?20:28, fontWeight:900, color:"#fff", lineHeight:1.1 }}>
-                {normalised.length}
-                <span style={{ color:"#818cf8", fontSize:winW<640?10:14 }}> skills</span>
-              </span>
+            {/* Surface Texture / Atmosphere shine */}
+            <div style={{ position:"absolute", inset:0, background:"linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%)", opacity:0.5 }} />
+            
+            {/* Content */}
+            <div style={{ position:"relative", zIndex:2, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%" }}>
+              <Cpu size={winW<640?16:24} className="text-indigo-300 mb-1 opacity-80" />
+              <span className="text-[10px] uppercase tracking-[0.4em] text-indigo-200/60 font-black">Core</span>
+              <div className="text-white font-black leading-tight flex items-baseline">
+                <span style={{ fontSize: winW<640 ? 24 : 36 }}>{normalised.length}</span>
+                <span className="text-xs text-indigo-400 ml-1">SKILLS</span>
+              </div>
             </div>
           </div>
+
+          {/* Orbital Aura Rings */}
+          {[1.2, 1.6, 2.0].map((s, i) => (
+            <motion.div key={i}
+              animate={{ scale: [s, s * 1.05, s], opacity: [0.15, 0.05, 0.15] }}
+              transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut" }}
+              style={{ position: "absolute", width: planetSize, height: planetSize, borderRadius: "50%",
+                border: "1px solid rgba(99,102,241,0.2)", pointerEvents: "none" }}
+            />
+          ))}
         </motion.div>
 
         {/* ── FRONT arc — in front of planet ──────────────── */}
-        <OrbitRingSVG rx={rx} ry={ry} half="front" />
+        <OrbitRingSVG rx={rx} half="front" />
 
-        {/* ── SATELLITES — always z:75 (in front) ─────────── */}
-        <div style={{ position:"absolute", left:"50%", top:"50%", width:0, height:0, zIndex:0, pointerEvents:"none" }}>
+        {/* ── SATELLITES — dynamic zIndex ─────────── */}
+        <div style={{ position:"absolute", left:"50%", top:"50%", width:0, height:0, pointerEvents:"none" }}>
           <div style={{ pointerEvents:"auto" }}>
             {normalised.map((skill, i) => (
               <Satellite
                 key={i} index={i} total={normalised.length}
                 skill={skill} progress={progress}
-                rx={rx} ry={ry}
+                rx={rx} planetSize={planetSize}
               />
             ))}
           </div>

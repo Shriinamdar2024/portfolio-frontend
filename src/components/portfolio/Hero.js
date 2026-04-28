@@ -85,7 +85,7 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
     <section
       id="hero"
       ref={sectionRef}
-      className={`relative h-screen flex items-center overflow-hidden pt-16 ${isDarkMode ? "bg-[#08080a] text-white" : "bg-[#f8f9ff] text-slate-900"
+      className={`relative min-h-screen flex items-center overflow-hidden pt-16 ${isDarkMode ? "bg-[#08080a] text-white" : "bg-[#f8f9ff] text-slate-900"
         }`}
     >
       {/* ── LAYER 0: Ambient animated mesh blobs ──────────────── */}
@@ -133,7 +133,7 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
       </motion.div>
 
       {/* ── LAYER 1: Main grid layout ──────────────────────────── */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 grid lg:grid-cols-[1fr_auto] gap-8 xl:gap-12 items-center py-0">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-16 grid lg:grid-cols-[1fr_auto] gap-8 xl:gap-12 items-center py-8 lg:py-0">
 
         {/* ── LEFT COLUMN ──────────────────────────────────────── */}
         <motion.div
@@ -211,7 +211,7 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
           </motion.p>
 
           {/* CTA buttons */}
-          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-4">
+          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3 sm:gap-4">
             {/* Primary CTA */}
             <motion.a
               href="#projects"
@@ -275,10 +275,10 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
           initial="hidden"
           animate="visible"
           style={{ y: imageY }}
-          className="relative flex items-center justify-center lg:justify-end"
+          className="relative flex items-center justify-center lg:justify-end mt-4 lg:mt-0"
         >
           {/* Outer size wrapper */}
-          <div className="relative w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] xl:w-[360px] xl:h-[360px]">
+          <div className="relative w-[200px] h-[200px] xs:w-[240px] xs:h-[240px] sm:w-[300px] sm:h-[300px] xl:w-[360px] xl:h-[360px]">
 
             {/* Rotating gradient ring */}
             <motion.div
@@ -321,7 +321,7 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
             <motion.div
               animate={{ y: [-12, 12, -12], rotate: [-1.5, 1.5, -1.5] }}
               transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-              className={`absolute -top-6 -left-8 sm:-left-16 p-4 rounded-2xl border shadow-2xl z-20 backdrop-blur-xl max-w-[200px] ${isDarkMode ? "bg-[#10101c]/95 border-white/8" : "bg-white/95 border-slate-200"
+              className={`hidden sm:block absolute -top-6 -left-8 sm:-left-16 p-4 rounded-2xl border shadow-2xl z-20 backdrop-blur-xl max-w-[180px] sm:max-w-[200px] ${isDarkMode ? "bg-[#10101c]/95 border-white/8" : "bg-white/95 border-slate-200"
                 }`}
             >
               <div className="flex items-center gap-1.5 mb-2.5">
@@ -363,7 +363,7 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
             <motion.div
               animate={{ y: [12, -12, 12], rotate: [1.5, -1.5, 1.5] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-              className={`absolute -bottom-4 -right-4 sm:-right-14 p-4 rounded-2xl border shadow-2xl z-20 backdrop-blur-xl flex items-center gap-3 ${isDarkMode ? "bg-[#10101c]/95 border-white/8" : "bg-white/95 border-slate-200"
+              className={`hidden sm:flex absolute -bottom-4 -right-4 sm:-right-14 p-3 sm:p-4 rounded-2xl border shadow-2xl z-20 backdrop-blur-xl items-center gap-3 ${isDarkMode ? "bg-[#10101c]/95 border-white/8" : "bg-white/95 border-slate-200"
                 }`}
             >
               <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg shrink-0" style={{ background: "linear-gradient(135deg, #6366f1, #ec4899)" }}>
@@ -388,7 +388,7 @@ const Hero = ({ name, bio, email, isDarkMode, profileImage, socials }) => {
             <motion.div
               animate={{ y: [-8, 8, -8] }}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-              className={`absolute top-1/2 -right-2 sm:-right-10 -translate-y-1/2 p-3 rounded-2xl border shadow-xl z-20 backdrop-blur-xl ${isDarkMode ? "bg-[#10101c]/95 border-white/8" : "bg-white/95 border-slate-200"
+              className={`hidden sm:block absolute top-1/2 -right-2 sm:-right-10 -translate-y-1/2 p-3 rounded-2xl border shadow-xl z-20 backdrop-blur-xl ${isDarkMode ? "bg-[#10101c]/95 border-white/8" : "bg-white/95 border-slate-200"
                 }`}
             >
               {["React", "Node", "Mongo"].map((t, i) => (

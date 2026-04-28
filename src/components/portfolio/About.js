@@ -18,7 +18,7 @@ const About = ({ data, isDarkMode, stagger, fadeUp }) => {
       </div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[400px] bg-gradient-to-r from-indigo-500/10 to-violet-500/10 blur-[100px] -z-10 rounded-full pointer-events-none" />
 
-      <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center w-full relative z-10">
+      <div className="grid lg:grid-cols-12 gap-8 lg:gap-8 items-center w-full relative z-10">
         {/* Left: Text Content */}
         <motion.div variants={fadeUp} className="lg:col-span-7 space-y-8">
           <div className="flex items-center gap-4">
@@ -68,11 +68,11 @@ const About = ({ data, isDarkMode, stagger, fadeUp }) => {
         </motion.div>
 
         {/* Right: Modern Stat Tiles Masonry layout */}
-        <motion.div variants={fadeUp} className="lg:col-span-5 grid grid-cols-2 gap-4 sm:gap-6 relative mt-10 lg:mt-0">
+        <motion.div variants={fadeUp} className="lg:col-span-5 grid grid-cols-2 gap-4 sm:gap-6 relative">
            <div className="absolute inset-0 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
            
-           {/* Column 1 (Flows slightly down) */}
-           <div className="flex flex-col gap-4 sm:gap-6 sm:translate-y-12">
+           {/* Column 1 — on desktop flows slightly down */}
+           <div className="flex flex-col gap-4 sm:gap-6 lg:translate-y-12">
              {/* Projects Tile */}
              <div className={`p-6 sm:p-8 rounded-[2rem] border backdrop-blur-md shadow-2xl ${isDarkMode ? 'bg-[#0d0d14]/90 border-white/5 hover:border-indigo-500/30' : 'bg-white border-slate-100 shadow-slate-200/50'} group hover:-translate-y-2 transition-all duration-500 flex flex-col justify-center relative overflow-hidden`}>
                 <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
@@ -100,10 +100,10 @@ const About = ({ data, isDarkMode, stagger, fadeUp }) => {
              </div>
            </div>
 
-           {/* Column 2 (Flows slightly up) */}
-           <div className="flex flex-col gap-4 sm:gap-6 sm:-translate-y-4">
+           {/* Column 2 — on desktop flows slightly up */}
+           <div className="flex flex-col gap-4 sm:gap-6 lg:-translate-y-4">
              {/* Primary Gradient Tile */}
-             <div className={`p-6 sm:p-8 rounded-[2rem] border backdrop-blur-md shadow-2xl shadow-indigo-500/20 group hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-[220px] sm:h-[260px] flex flex-col justify-center`} style={{ background: "linear-gradient(135deg, #4f46e5, #7c3aed)" }}>
+             <div className={`p-5 sm:p-8 rounded-[2rem] border backdrop-blur-md shadow-2xl shadow-indigo-500/20 group hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-[200px] sm:h-[260px] flex flex-col justify-center`} style={{ background: "linear-gradient(135deg, #4f46e5, #7c3aed)" }}>
                 <div className="absolute inset-x-0 top-0 h-1/2 bg-white/10 blur-2xl rounded-full" />
                 <div className="absolute -right-10 -bottom-10 opacity-20 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700">
                    <Cpu size={140} className="text-white" />
